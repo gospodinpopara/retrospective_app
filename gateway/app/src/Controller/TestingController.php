@@ -11,6 +11,6 @@ class TestingController extends AbstractController
     #[Route('/testing', name: 'testing')]
     public function test(): JsonResponse
     {
-        return new JsonResponse("Volume testing");
+        return new JsonResponse("Db testing");
     }
 }
