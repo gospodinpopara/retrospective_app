@@ -1,0 +1,16 @@
+overblog_graphql:
+    definitions:
+        schema:
+            query: Query
+            mutation: Mutation
+            types: ["DateTime", "Json"]
+        mappings:
+            auto_discover: true
+            types:
+                -
+                    type: yaml
+                    dir: "%kernel.project_dir%/config/graphql/types"
+                    suffix: null
+        default_field_resolver: 'App\GraphQL\Resolver\Resolver'
+    security:
+        enable_introspection: '%kernel.debug%'

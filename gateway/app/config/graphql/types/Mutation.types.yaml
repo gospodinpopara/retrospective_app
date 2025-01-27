@@ -1,0 +1,8 @@
+Mutation:
+  type: object
+  config:
+    fields:
+      testMutation:
+        type: "dummyData"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\TestMutation::testMutation")'
+

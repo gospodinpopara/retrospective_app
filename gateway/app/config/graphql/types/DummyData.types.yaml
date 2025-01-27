@@ -1,0 +1,6 @@
+dummyData:
+  type: object
+  config:
+    fields:
+      name:
+        type: "String"
