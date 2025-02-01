@@ -5,4 +5,9 @@ Mutation:
       testMutation:
         type: "dummyData"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\TestMutation::testMutation")'
-
+      emailVerification:
+        type: "SiteMessage"
+        description: "Handles email verification using a verification token"
+        args:
+          verificationToken: "String!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\AuthMutation::emailVerificationTokenMutation", args)'

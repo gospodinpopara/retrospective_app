@@ -2,9 +2,11 @@
 
 namespace App\GraphQL\Mutation;
 
+use App\Model\SiteMessageModel;
 use App\Service\AuthService;
 use Overblog\GraphQLBundle\Definition\Resolver\AliasedInterface;
 use Overblog\GraphQLBundle\Definition\Resolver\MutationInterface;
+use Overblog\GraphQLBundle\Definition\Argument;
 
 class AuthMutation implements MutationInterface, AliasedInterface
 {
@@ -14,17 +16,19 @@ class AuthMutation implements MutationInterface, AliasedInterface
         private readonly AuthService $authService,
     ) { }
 
-    public function emailVerificationTokenMutation(): array
+    public function emailVerificationTokenMutation(Argument $arguments): array
     {
-        // TODO implement mutation logic
+        $token = $arguments->offsetGet('verificationToken');
 
-        return [];
+        if($token === null) {
+            throw new \InvalidArgumentException('Verification token is required.');
+        }
+
+        return $this->authService->emailTokenVerification(verificationToken: $token);
     }
 
     public function emailVerificationTokenResendMutation(): array
     {
-        // TODO implement token resend
-
         return [];
     }
 

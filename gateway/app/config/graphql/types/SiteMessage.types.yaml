@@ -1,0 +1,14 @@
+SiteMessage:
+  type: object
+  config:
+    description: "Represents a system message for the site."
+    fields:
+      success:
+        type: "Boolean!"
+        description: "Indicates whether the operation was successful."
+      message:
+        type: "String!"
+        description: "The message content to be displayed to the user."
+      messageType:
+        type: "String"
+        description: "The category of the message (SUCCESS, DANGER, WARNING, INFO)."
