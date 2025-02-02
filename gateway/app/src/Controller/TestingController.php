@@ -25,7 +25,6 @@ class TestingController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'user' => $user,
         ]);
     }
 }

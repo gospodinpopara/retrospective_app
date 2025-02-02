@@ -2,12 +2,15 @@ Mutation:
   type: object
   config:
     fields:
-      testMutation:
-        type: "dummyData"
-        resolve: '@=mutation("App\\GraphQL\\Mutation\\TestMutation::testMutation")'
       emailVerification:
         type: "SiteMessage"
         description: "Handles email verification using a verification token"
         args:
           verificationToken: "String!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\AuthMutation::emailVerificationTokenMutation", args)'
+      emailVerificationTokenResend:
+        type: "SiteMessage"
+        description: "Resends the email verification token to the user."
+        args:
+          email: "String!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\AuthMutation::emailVerificationTokenResendMutation", args)'

@@ -27,9 +27,15 @@ class AuthMutation implements MutationInterface, AliasedInterface
         return $this->authService->emailTokenVerification(verificationToken: $token);
     }
 
-    public function emailVerificationTokenResendMutation(): array
+    public function emailVerificationTokenResendMutation(Argument $arguments): array
     {
-        return [];
+        $email = $arguments->offsetGet('email');
+
+        if($email === null) {
+            throw new \InvalidArgumentException('Email is required.');
+        }
+
+        return $this->authService->resendEmailVerificationToken(email: $email);
     }
 
     public function userRegistrationMutation(): array
