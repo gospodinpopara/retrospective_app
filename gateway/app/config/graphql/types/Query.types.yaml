@@ -3,6 +3,7 @@ Query:
   config:
     description: "User ORM repository"
     fields:
-      testing:
-        type: "dummyData"
-        resolve: '@=query("App\\GraphQL\\Resolver\\TestResolver::getTest")'
+      user:
+        type: "User"
+        resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::getUser")'
+
