@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\GraphQL\Type;
 
 use GraphQL\Language\AST\Node;

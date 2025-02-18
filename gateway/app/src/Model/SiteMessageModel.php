@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model;
 
 class SiteMessageModel
@@ -11,18 +13,18 @@ class SiteMessageModel
 
     private bool $success {
         get {
-            return $this->success;
-        }
+        return $this->success;
+    }
     }
     private string $message {
         get {
-            return $this->message;
-        }
+        return $this->message;
+    }
     }
     private string $messageType {
         get {
-            return $this->messageType;
-        }
+        return $this->messageType;
+    }
     }
 
     public function __construct(bool $success, string $message, string $messageType)
@@ -31,5 +33,4 @@ class SiteMessageModel
         $this->message = $message;
         $this->messageType = $messageType;
     }
-
 }

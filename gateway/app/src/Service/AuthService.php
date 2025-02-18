@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\EmailVerificationToken;
@@ -11,14 +13,14 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Random\RandomException;
 
-class
-AuthService
+class AuthService
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly EmailVerificationTokenRepository $emailVerificationTokenRepository,
         private readonly UserRepository $userRepository
-    ) { }
+    ) {
+    }
 
     public function invalidateUserRefreshTokens(User $user): void
     {
@@ -48,36 +50,36 @@ AuthService
         return $token;
     }
 
-
     /**
      * @param string $email
+     *
      * @return array
      */
     public function resendEmailVerificationToken(string $email): array
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
 
-        if($user === null) {
+        if ($user === null) {
             return [
                 'success' => false,
                 'message' => 'Email verification token sent.',
-                'messageType' => SiteMessageModel::MESSAGE_WARNING
+                'messageType' => SiteMessageModel::MESSAGE_WARNING,
             ];
         }
 
-        if (in_array($user->getAccountStatus(), [User::ACCOUNT_STATUS_BANNED, User::ACCOUNT_STATUS_SUSPENDED], true)) {
+        if (\in_array($user->getAccountStatus(), [User::ACCOUNT_STATUS_BANNED, User::ACCOUNT_STATUS_SUSPENDED], true)) {
             return [
                 'success' => false,
-                'message' => 'Cannot activate user, account is suspended, status: ' . $user->getAccountStatus(),
-                'messageType' => SiteMessageModel::MESSAGE_INFO
+                'message' => 'Cannot activate user, account is suspended, status: '.$user->getAccountStatus(),
+                'messageType' => SiteMessageModel::MESSAGE_INFO,
             ];
         }
 
-        if($user->getAccountStatus() === User::ACCOUNT_STATUS_ACTIVE && $user->isEmailVerified()) {
+        if ($user->getAccountStatus() === User::ACCOUNT_STATUS_ACTIVE && $user->isEmailVerified()) {
             return [
                 'success' => false,
                 'message' => 'Your account is already verified.',
-                'messageType' => SiteMessageModel::MESSAGE_INFO
+                'messageType' => SiteMessageModel::MESSAGE_INFO,
             ];
         }
 
@@ -87,13 +89,13 @@ AuthService
         return [
             'success' => true,
             'message' => 'Verification email successfully sent, check you inbox',
-            'messageType' => SiteMessageModel::MESSAGE_SUCCESS
+            'messageType' => SiteMessageModel::MESSAGE_SUCCESS,
         ];
     }
 
-
     /**
      * @param User $user
+     *
      * @return void
      */
     public function activateUser(User $user): void
@@ -107,6 +109,7 @@ AuthService
 
     /**
      * @param string $verificationToken
+     *
      * @return array
      */
     public function emailTokenVerification(string $verificationToken): array
@@ -117,7 +120,7 @@ AuthService
             return [
                 'success' => false,
                 'message' => 'Email verification failed, invalid token provided.',
-                'messageType' => SiteMessageModel::MESSAGE_WARNING
+                'messageType' => SiteMessageModel::MESSAGE_WARNING,
             ];
         }
 
@@ -125,7 +128,7 @@ AuthService
             return [
                 'success' => false,
                 'message' => 'Email verification failed, token expired.',
-                'messageType' => SiteMessageModel::MESSAGE_WARNING
+                'messageType' => SiteMessageModel::MESSAGE_WARNING,
             ];
         }
 
@@ -135,15 +138,15 @@ AuthService
             return [
                 'success' => false,
                 'message' => 'Cannot associate verification token to user.',
-                'messageType' => SiteMessageModel::MESSAGE_WARNING
+                'messageType' => SiteMessageModel::MESSAGE_WARNING,
             ];
         }
 
-        if (in_array($user->getAccountStatus(), [User::ACCOUNT_STATUS_BANNED, User::ACCOUNT_STATUS_SUSPENDED], true)) {
+        if (\in_array($user->getAccountStatus(), [User::ACCOUNT_STATUS_BANNED, User::ACCOUNT_STATUS_SUSPENDED], true)) {
             return [
                 'success' => false,
-                'message' => 'Cannot activate user, account is suspended, status: ' . $user->getAccountStatus(),
-                'messageType' => SiteMessageModel::MESSAGE_INFO
+                'message' => 'Cannot activate user, account is suspended, status: '.$user->getAccountStatus(),
+                'messageType' => SiteMessageModel::MESSAGE_INFO,
             ];
         }
 
@@ -152,9 +155,7 @@ AuthService
         return [
             'success' => true,
             'message' => 'User successfully verified and activated.',
-            'messageType' => SiteMessageModel::MESSAGE_SUCCESS
+            'messageType' => SiteMessageModel::MESSAGE_SUCCESS,
         ];
-
     }
-
 }

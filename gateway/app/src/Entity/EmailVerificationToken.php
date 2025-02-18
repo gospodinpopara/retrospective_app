@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\EmailVerificationTokenRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-
 
 #[ORM\Entity(repositoryClass: EmailVerificationTokenRepository::class)]
 class EmailVerificationToken
@@ -39,7 +40,6 @@ class EmailVerificationToken
     }
 
     public function getToken(): ?string
-
     {
         return $this->token;
     }

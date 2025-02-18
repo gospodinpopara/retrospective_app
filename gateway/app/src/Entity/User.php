@@ -1,20 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-
     public const string ACCOUNT_STATUS_ACTIVE = 'active';
     public const string ACCOUNT_STATUS_PENDING = 'pending';
     public const string ACCOUNT_STATUS_SUSPENDED = 'suspended';
@@ -35,7 +36,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Assert\NotBlank(message: "Email should not be blank.")]
+    #[Assert\NotBlank(message: 'Email should not be blank.')]
     #[Assert\Email(message: "The email '{{ value }}' is not a valid email address.")]
     private ?string $email = null;
 
@@ -159,8 +160,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setAccountStatus(string $accountStatus): self
     {
-        if (!in_array($accountStatus, self::ACCOUNT_STATUS, true)) {
-            throw new \InvalidArgumentException(sprintf("Invalid account status '%s'", $accountStatus));
+        if (!\in_array($accountStatus, self::ACCOUNT_STATUS, true)) {
+            throw new \InvalidArgumentException(\sprintf("Invalid account status '%s'", $accountStatus));
         }
 
         $this->accountStatus = $accountStatus;
