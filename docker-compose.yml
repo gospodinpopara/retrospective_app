@@ -49,6 +49,8 @@ services:
       - ./gateway/app:/var/www/project
     networks:
       - retrospective-network
+    environment:
+      PHP_CS_FIXER_IGNORE_ENV: 1 #cs fixer still don't support php 8.4, fix flag
 
   gateway-nginx-service:
     image: nginx:stable-alpine
