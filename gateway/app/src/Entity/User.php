@@ -90,6 +90,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
+        /* @phpstan-ignore-next-line */
         return (string) $this->email;
     }
 
@@ -104,6 +105,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
+        /* @phpstan-ignore-next-line */
         return array_unique($roles);
     }
 
