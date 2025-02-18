@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\EmailVerificationTokenRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 
 #[ORM\Entity(repositoryClass: EmailVerificationTokenRepository::class)]
 class EmailVerificationToken
@@ -19,6 +22,14 @@ class EmailVerificationToken
     #[ORM\Column]
     private ?\DateTimeImmutable $expiresAt = null;
 
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTime $createdAt = null;
+
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTime $updatedAt = null;
+
     #[ORM\ManyToOne]
     private ?User $user = null;
 
@@ -28,6 +39,7 @@ class EmailVerificationToken
     }
 
     public function getToken(): ?string
+
     {
         return $this->token;
     }
