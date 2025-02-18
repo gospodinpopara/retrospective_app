@@ -1,0 +1,15 @@
+includes:
+    - tools/vendor/phpstan/phpstan-doctrine/extension.neon
+
+parameters:
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
+        - identifier: staticClassAccess.privateMethod
+
+    paths:
+        - src
+    tmpDir: var/cache/phpstan
+    level: 7
+

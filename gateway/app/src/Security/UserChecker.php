@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Security;
 
 use App\Entity\User;
@@ -10,10 +12,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class UserChecker implements UserCheckerInterface
 {
     private const array ACCOUNT_STATUS_MESSAGES = [
-        User::ACCOUNT_STATUS_PENDING   => 'Your account is pending approval.',
+        User::ACCOUNT_STATUS_PENDING => 'Your account is pending approval.',
         User::ACCOUNT_STATUS_SUSPENDED => 'Your account is suspended.',
-        User::ACCOUNT_STATUS_BANNED    => 'Your account is banned.',
-        User::ACCOUNT_STATUS_DELETED   => 'Your account is deleted.',
+        User::ACCOUNT_STATUS_BANNED => 'Your account is banned.',
+        User::ACCOUNT_STATUS_DELETED => 'Your account is deleted.',
     ];
 
     public function checkPreAuth(UserInterface $user): void
@@ -36,6 +38,5 @@ class UserChecker implements UserCheckerInterface
 
     public function checkPostAuth(UserInterface $user): void
     {
-
     }
 }

@@ -6,6 +6,12 @@
 /public/bundles/
 /var/
 /vendor/
+tools/vendor/
+###> friendsofphp/php-cs-fixer ###
+
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
 ###< symfony/framework-bundle ###
 
 ###> lexik/jwt-authentication-bundle ###
