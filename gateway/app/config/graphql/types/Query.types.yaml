@@ -3,7 +3,7 @@ Query:
   config:
     description: "User ORM repository"
     fields:
-      user:
+      User:
         type: "User"
         resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::getUser")'
 

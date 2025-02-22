@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutation;
 
+use App\DTO\Input\UserRegistrationInput;
+use App\DTO\Response\UserRegistrationResponse;
 use App\Service\AuthService;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Definition\Resolver\AliasedInterface;
 use Overblog\GraphQLBundle\Definition\Resolver\MutationInterface;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class AuthMutation implements MutationInterface, AliasedInterface
 {
@@ -15,12 +19,13 @@ class AuthMutation implements MutationInterface, AliasedInterface
 
     public function __construct(
         private readonly AuthService $authService,
+        private readonly DenormalizerInterface $denormalizer,
     ) {
     }
 
-    public function emailVerificationTokenMutation(Argument $arguments): array
+    public function emailVerificationTokenMutation(Argument $args): array
     {
-        $token = $arguments->offsetGet('verificationToken');
+        $token = $args->offsetGet('verificationToken');
 
         if ($token === null) {
             throw new \InvalidArgumentException('Verification token is required.');
@@ -29,9 +34,9 @@ class AuthMutation implements MutationInterface, AliasedInterface
         return $this->authService->emailTokenVerification(verificationToken: $token);
     }
 
-    public function emailVerificationTokenResendMutation(Argument $arguments): array
+    public function emailVerificationTokenResendMutation(Argument $args): array
     {
-        $email = $arguments->offsetGet('email');
+        $email = $args->offsetGet('email');
 
         if ($email === null) {
             throw new \InvalidArgumentException('Email is required.');
@@ -40,11 +45,14 @@ class AuthMutation implements MutationInterface, AliasedInterface
         return $this->authService->resendEmailVerificationToken(email: $email);
     }
 
-    public function userRegistrationMutation(): array
+    /**
+     * @throws ExceptionInterface
+     */
+    public function userRegistrationMutation(Argument $args): UserRegistrationResponse
     {
-        // TODO implement user registration
+        $userRegistrationInput = $this->denormalizer->denormalize($args->offsetGet('userRegistrationInput'), UserRegistrationInput::class, 'array');
 
-        return [];
+        return $this->authService->registerUser(userRegistrationInput: $userRegistrationInput);
     }
 
     public static function getAliases(): array

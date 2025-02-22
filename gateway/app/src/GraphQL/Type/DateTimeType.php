@@ -12,6 +12,8 @@ class DateTimeType extends ScalarType implements AliasedInterface
 {
     public string $name = 'DateTime';
 
+    public ?string $description = 'A scalar type representing a DateTime value in the format Y-m-d H:i:s.';
+
     /**
      * {@inheritdoc}
      */
