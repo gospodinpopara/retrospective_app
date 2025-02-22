@@ -13,6 +13,9 @@ class Resolver
     private static ?PropertyAccessor $accessor = null;
 
     /**
+     * @param mixed $objectOrArray
+     * @param mixed $args
+     * @param mixed $context
      * @param ResolveInfo $info
      *
      * @return mixed|null
@@ -54,6 +57,8 @@ class Resolver
     }
 
     /**
+     * @param mixed $objectOrArray
+     * @param mixed $indexOrProperty
      * @return bool
      */
     private static function isReadable(mixed $objectOrArray, mixed $indexOrProperty): bool
@@ -62,6 +67,8 @@ class Resolver
     }
 
     /**
+     * @param mixed $objectOrArray
+     * @param mixed $indexOrProperty
      * @return bool
      */
     private static function isWritable(mixed $objectOrArray, mixed $indexOrProperty): bool

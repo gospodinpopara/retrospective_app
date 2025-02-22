@@ -8,3 +8,29 @@ User:
       email:
         type: "String"
         description: "User email"
+      roles:
+        type: "[String]"
+      isEmailVerified:
+        type: "Boolean"
+      accountStatus:
+        type: "String"
+      createdAt:
+        type: "DateTime"
+
+UserRegistrationInput:
+  type: input-object
+  config:
+    fields:
+      email: "String!"
+      password: "String!"
+      confirmPassword: "String!"
+      firstName: "String!"
+      lastName: "String!"
+
+UserRegistrationResponse:
+  type: object
+  config:
+    fields:
+      success: "Boolean"
+      errors: "ValidationError"
+      user: "User"

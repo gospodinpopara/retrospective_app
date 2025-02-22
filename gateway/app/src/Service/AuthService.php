@@ -4,21 +4,32 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\DTO\Input\UserRegistrationInput;
+use App\DTO\Response\UserRegistrationResponse;
 use App\Entity\EmailVerificationToken;
 use App\Entity\RefreshToken;
 use App\Entity\User;
 use App\Model\SiteMessageModel;
 use App\Repository\EmailVerificationTokenRepository;
 use App\Repository\UserRepository;
+use App\Utils\ValidationErrorFormatter;
 use Doctrine\ORM\EntityManagerInterface;
+use GraphQL\Error\UserError;
 use Random\RandomException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AuthService
 {
+    use ValidationErrorFormatter;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly EmailVerificationTokenRepository $emailVerificationTokenRepository,
-        private readonly UserRepository $userRepository
+        private readonly UserRepository $userRepository,
+        private readonly ValidatorInterface $validator,
+        private readonly UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 
@@ -157,5 +168,52 @@ class AuthService
             'message' => 'User successfully verified and activated.',
             'messageType' => SiteMessageModel::MESSAGE_SUCCESS,
         ];
+    }
+
+    /**
+     * @param UserRegistrationInput $userRegistrationInput
+     *
+     * @return UserRegistrationResponse
+     */
+    public function registerUser(UserRegistrationInput $userRegistrationInput): UserRegistrationResponse
+    {
+        /* Validation */
+        $validation = $this->validator->validate($userRegistrationInput);
+
+        if (\count($validation) > 0) {
+            return new UserRegistrationResponse(
+                success: false,
+                errors: $this->formatValidationErrors($validation),
+                user: null,
+            );
+        }
+
+        if ($this->userRepository->existsByEmail($userRegistrationInput->getEmail())) {
+            throw new UserError(message: "User with email {$userRegistrationInput->getEmail()} already exists.", code: Response::HTTP_CONFLICT);
+        }
+
+        $user = new User();
+        $user->setEmail($userRegistrationInput->getEmail())
+            ->setFirstName($userRegistrationInput->getFirstName())
+            ->setLastName($userRegistrationInput->getLastName())
+            ->setRoles(['ROLE_USER']);
+
+        // Hash the password
+        $hashedPassword = $this->passwordHasher->hashPassword(
+            $user,
+            $userRegistrationInput->getPassword()
+        );
+
+        $user->setPassword($hashedPassword);
+
+        /* Save new user */
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return new UserRegistrationResponse(
+            success: true,
+            errors: [],
+            user: $user,
+        );
     }
 }
