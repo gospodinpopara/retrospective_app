@@ -1,21 +1,26 @@
 User:
   type: object
   config:
+    description: "Represents a user in the system with their account information and permissions"
     fields:
       id:
-        type: "Int"
-        description: "id"
+        type: "Int!"
+        description: "The unique identifier of the user"
       email:
-        type: "String"
-        description: "User email"
+        type: "String!"
+        description: "The email address used for user authentication and communication"
       roles:
-        type: "[String]"
+        type: "[String!]!"
+        description: "List of roles assigned to the user defining their permissions in the system"
       isEmailVerified:
-        type: "Boolean"
+        type: "Boolean!"
+        description: "Indicates whether the user's email address has been verified"
       accountStatus:
-        type: "String"
+        type: "String!"
+        description: "Current status of the user account (e.g., active, suspended, pending)"
       createdAt:
-        type: "DateTime"
+        type: "DateTime!"
+        description: "Timestamp when the user account was created"
 
 UserRegistrationInput:
   type: input-object

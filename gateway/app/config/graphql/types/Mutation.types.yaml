@@ -2,23 +2,62 @@ Mutation:
   type: object
   config:
     fields:
-      EmailVerification:
+      emailVerification:
         type: "SiteMessage"
         description: "Handles email verification using a verification token"
         args:
           verificationToken: "String!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\AuthMutation::emailVerificationTokenMutation", args)'
-      EmailVerificationTokenResend:
+      emailVerificationTokenResend:
         type: "SiteMessage"
         description: "Resends the email verification token to the user."
         args:
           email: "String!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\AuthMutation::emailVerificationTokenResendMutation", args)'
-      UserRegistration:
+      userRegistration:
         type: "UserRegistrationResponse"
         description: "Register user"
         args:
           userRegistrationInput: "UserRegistrationInput!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\AuthMutation::userRegistrationMutation", args)'
-
-
+      createRetrospective:
+        type: "RetrospectiveCreateResponse"
+        description: "Create retrospective"
+        args:
+          retrospectiveCreateInput: "RetrospectiveCreateInput"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveMutation::createRetrospectiveMutation", args)'
+      updateRetrospective:
+        type: "RetrospectiveUpdateResponse"
+        description: "Update retrospective"
+        args:
+          id: "Int!"
+          retrospectiveUpdateInput: "RetrospectiveUpdateInput!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveMutation::updateRetrospectiveMutation", args)'
+      deleteRetrospective:
+        type: "Boolean"
+        description: "Delete retrospective"
+        args:
+          id: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveMutation::deleteRetrospectiveMutation", args)'
+      createRetrospectiveParticipant:
+        type: "CreateRetrospectiveParticipantResponse"
+        description: ""
+        args:
+          retrospectiveId: "Int!"
+          participantId: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveParticipantMutation::createRetrospectiveParticipantMutation", args)'
+      deleteRetrospectiveParticipant:
+        type: "Boolean"
+        description: "remove user from retrospective"
+        args:
+          retrospectiveId: "Int!"
+          participantId: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveParticipantMutation::deleteRetrospectiveParticipantMutation", args)'
+      updateRetrospectiveParticipant:
+        type: "UpdateRetrospectiveParticipantResponse"
+        description: ""
+        args:
+          retrospectiveId: "Int!"
+          participantId: "Int!"
+          status: "RetrospectiveParticipantStatus!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveParticipantMutation::updateRetrospectiveParticipantMutation", args)'

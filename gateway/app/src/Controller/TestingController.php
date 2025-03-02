@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 class TestingController extends AbstractController
 {
@@ -17,6 +18,9 @@ class TestingController extends AbstractController
     ) {
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     #[Route('/testing', name: 'testing')]
     public function test(): JsonResponse
     {
@@ -24,7 +28,9 @@ class TestingController extends AbstractController
         $user = $this->security->getUser();
 
         return new JsonResponse([
-            'success' => true,
+            'action' => 'Auth check',
+            'success' => !($user === null),
+            'userId' => $user?->getId(),
         ]);
     }
 }

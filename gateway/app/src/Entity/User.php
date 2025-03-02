@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -71,6 +73,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Gedmo\Timestampable(on: 'update')]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTime $updatedAt = null;
+
+    /**
+     * @var Collection<int, Retrospective>
+     */
+    #[ORM\OneToMany(targetEntity: Retrospective::class, mappedBy: 'owner')]
+    private Collection $retrospectives;
+
+    /**
+     * @var Collection<int, RetrospectiveParticipant>
+     */
+    #[ORM\OneToMany(targetEntity: RetrospectiveParticipant::class, mappedBy: 'user')]
+    private Collection $retrospectiveParticipants;
+
+    public function __construct()
+    {
+        $this->retrospectives = new ArrayCollection();
+        $this->retrospectiveParticipants = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -217,6 +237,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Retrospective>
+     */
+    public function getRetrospectives(): Collection
+    {
+        return $this->retrospectives;
+    }
+
+    public function addRetrospective(Retrospective $retrospective): static
+    {
+        if (!$this->retrospectives->contains($retrospective)) {
+            $this->retrospectives->add($retrospective);
+            $retrospective->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRetrospective(Retrospective $retrospective): static
+    {
+        if ($this->retrospectives->removeElement($retrospective)) {
+            // set the owning side to null (unless already changed)
+            if ($retrospective->getOwner() === $this) {
+                $retrospective->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RetrospectiveParticipant>
+     */
+    public function getRetrospectiveParticipants(): Collection
+    {
+        return $this->retrospectiveParticipants;
+    }
+
+    public function addRetrospectiveParticipant(RetrospectiveParticipant $retrospectiveParticipant): static
+    {
+        if (!$this->retrospectiveParticipants->contains($retrospectiveParticipant)) {
+            $this->retrospectiveParticipants->add($retrospectiveParticipant);
+            $retrospectiveParticipant->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRetrospectiveParticipant(RetrospectiveParticipant $retrospectiveParticipant): static
+    {
+        if ($this->retrospectiveParticipants->removeElement($retrospectiveParticipant)) {
+            // set the owning side to null (unless already changed)
+            if ($retrospectiveParticipant->getUser() === $this) {
+                $retrospectiveParticipant->setUser(null);
+            }
+        }
 
         return $this;
     }

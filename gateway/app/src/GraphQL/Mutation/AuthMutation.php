@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutation;
 
-use App\DTO\Input\UserRegistrationInput;
-use App\DTO\Response\UserRegistrationResponse;
+use App\DTO\Input\Auth\UserRegistrationInput;
+use App\DTO\Response\Auth\UserRegistrationMutationResponse;
 use App\Service\AuthService;
 use Overblog\GraphQLBundle\Definition\Argument;
-use Overblog\GraphQLBundle\Definition\Resolver\AliasedInterface;
 use Overblog\GraphQLBundle\Definition\Resolver\MutationInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-class AuthMutation implements MutationInterface, AliasedInterface
+class AuthMutation implements MutationInterface
 {
-    // TODO implement token refresh
-
     public function __construct(
         private readonly AuthService $authService,
         private readonly DenormalizerInterface $denormalizer,
     ) {
     }
 
+    /**
+     * @param Argument $args
+     *
+     * @return array
+     */
     public function emailVerificationTokenMutation(Argument $args): array
     {
         $token = $args->offsetGet('verificationToken');
@@ -34,6 +36,11 @@ class AuthMutation implements MutationInterface, AliasedInterface
         return $this->authService->emailTokenVerification(verificationToken: $token);
     }
 
+    /**
+     * @param Argument $args
+     *
+     * @return array
+     */
     public function emailVerificationTokenResendMutation(Argument $args): array
     {
         $email = $args->offsetGet('email');
@@ -48,15 +55,10 @@ class AuthMutation implements MutationInterface, AliasedInterface
     /**
      * @throws ExceptionInterface
      */
-    public function userRegistrationMutation(Argument $args): UserRegistrationResponse
+    public function userRegistrationMutation(Argument $args): UserRegistrationMutationResponse
     {
         $userRegistrationInput = $this->denormalizer->denormalize($args->offsetGet('userRegistrationInput'), UserRegistrationInput::class, 'array');
 
         return $this->authService->registerUser(userRegistrationInput: $userRegistrationInput);
-    }
-
-    public static function getAliases(): array
-    {
-        return [];
     }
 }

@@ -1,0 +1,89 @@
+Retrospective:
+  type: object
+  config:
+    description: "Retrospective type definition"
+    fields:
+      id:
+        type: "Int!"
+        description: "The unique identifier of the retrospective"
+      title:
+        type: "String!"
+        description: "The title of the retrospective"
+      description:
+        type: "String!"
+        description: "The detailed description of the retrospective"
+      startTime:
+        type: "DateTime!"
+        description: "The start time of the retrospective"
+      status:
+        type: "RetrospectiveStatus!"
+        description: "The current status of the retrospective"
+      createdAt:
+        type: "DateTime!"
+        description: "Timestamp of when the retrospective was created"
+      updatedAt:
+        type: "DateTime!"
+        description: "Timestamp of the last update"
+
+RetrospectiveStatus:
+  type: enum
+  config:
+    description: "Available statuses for a retrospective"
+    values:
+      scheduled:
+        description: "Retrospective is scheduled to occur"
+        value: scheduled
+      finished:
+        description: "Retrospective has been completed"
+        value: finished
+      cancelled:
+        description: "Retrospective has been cancelled"
+        value: cancelled
+
+RetrospectiveCreateInput:
+  type: input-object
+  config:
+    description: "Input type for creating a new retrospective"
+    fields:
+      title:
+        type: "String!"
+        description: "The title of the retrospective"
+      description:
+        type: "String!"
+        description: "The detailed description of the retrospective"
+      startTime:
+        type: "DateTime!"
+        description: "The start time of the retrospective"
+
+RetrospectiveCreateResponse:
+  type: object
+  config:
+    fields:
+      success: "Boolean"
+      errors: "ValidationError"
+      retrospective: "Retrospective"
+
+RetrospectiveUpdateInput:
+  type: input-object
+  config:
+    fields:
+      title:
+        type: "String"
+        description: "New title for the retrospective"
+      description:
+        type: "String"
+        description: "New description for the retrospective"
+      status:
+        type: "RetrospectiveStatus"
+        description: "New status for the retrospective"
+      startTime:
+        type: "DateTime"
+        description: "New start time for the retrospective"
+
+RetrospectiveUpdateResponse:
+  type: object
+  config:
+    fields:
+      success: "Boolean"
+      errors: "ValidationError"
+      retrospective: "Retrospective"
