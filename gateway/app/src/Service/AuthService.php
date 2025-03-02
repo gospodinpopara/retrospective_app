@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\DTO\Input\UserRegistrationInput;
-use App\DTO\Response\UserRegistrationResponse;
+use App\DTO\Input\Auth\UserRegistrationInput;
+use App\DTO\Response\Auth\UserRegistrationMutationResponse;
 use App\Entity\EmailVerificationToken;
 use App\Entity\RefreshToken;
 use App\Entity\User;
@@ -33,6 +33,11 @@ class AuthService
     ) {
     }
 
+    /**
+     * @param User $user
+     *
+     * @return void
+     */
     public function invalidateUserRefreshTokens(User $user): void
     {
         $refreshTokens = $this->entityManager->getRepository(RefreshToken::class)
@@ -173,19 +178,15 @@ class AuthService
     /**
      * @param UserRegistrationInput $userRegistrationInput
      *
-     * @return UserRegistrationResponse
+     * @return UserRegistrationMutationResponse
      */
-    public function registerUser(UserRegistrationInput $userRegistrationInput): UserRegistrationResponse
+    public function registerUser(UserRegistrationInput $userRegistrationInput): UserRegistrationMutationResponse
     {
         /* Validation */
-        $validation = $this->validator->validate($userRegistrationInput);
+        $validationErrors = $this->validator->validate($userRegistrationInput);
 
-        if (\count($validation) > 0) {
-            return new UserRegistrationResponse(
-                success: false,
-                errors: $this->formatValidationErrors($validation),
-                user: null,
-            );
+        if (\count($validationErrors) > 0) {
+            UserRegistrationMutationResponse::failure(errors: $this->formatValidationErrors($validationErrors));
         }
 
         if ($this->userRepository->existsByEmail($userRegistrationInput->getEmail())) {
@@ -201,7 +202,7 @@ class AuthService
         // Hash the password
         $hashedPassword = $this->passwordHasher->hashPassword(
             $user,
-            $userRegistrationInput->getPassword()
+            $userRegistrationInput->getPassword(),
         );
 
         $user->setPassword($hashedPassword);
@@ -210,10 +211,6 @@ class AuthService
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        return new UserRegistrationResponse(
-            success: true,
-            errors: [],
-            user: $user,
-        );
+        return UserRegistrationMutationResponse::success($user);
     }
 }

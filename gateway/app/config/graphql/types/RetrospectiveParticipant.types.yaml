@@ -1,0 +1,54 @@
+RetrospectiveParticipant:
+  type: object
+  config:
+    description: "RetrospectiveParticipant type definition"
+    fields:
+      id:
+        type: "Int!"
+        description: "The unique identifier of the retrospective participant"
+      status:
+        type: "RetrospectiveParticipantStatus!"
+        description: "The status of the participant's involvement in the retrospective"
+      createdAt:
+        type: "DateTime!"
+        description: "Timestamp of when the participant was added to the retrospective"
+      updatedAt:
+        type: "DateTime!"
+        description: "Timestamp of the last update to the participant's record"
+      user:
+        type: "User!"
+        description: "The user participating in the retrospective"
+      retrospective:
+        type: "Retrospective!"
+        description: "The retrospective the user is participating in"
+
+RetrospectiveParticipantStatus:
+  type: enum
+  config:
+    description: "Available statuses for a retrospective participant"
+    values:
+      pending:
+        description: "Participant invitation is pending response"
+        value: pending
+      accepted:
+        description: "Participant has accepted the invitation"
+        value: accepted
+      declined:
+        description: "Participant has declined the invitation"
+        value: declined
+
+CreateRetrospectiveParticipantResponse:
+  type: object
+  config:
+    fields:
+      success: "Boolean"
+      errors: "ValidationError"
+      retrospectiveParticipant: "RetrospectiveParticipant"
+
+UpdateRetrospectiveParticipantResponse:
+  type: object
+  config:
+    fields:
+      success: "Boolean"
+      errors: "ValidationError"
+      retrospectiveParticipant: "RetrospectiveParticipant"
