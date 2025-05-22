@@ -48,7 +48,7 @@ class RetrospectiveParticipantService
             throw new NotFoundHttpException(message: "Retrospective resource with id: {$inviteUserToRetrospectiveInput->getRetrospectiveId()} not found");
         }
 
-        if ($this->retrospectiveService->isUserRetrospectiveOwner(userId: $owner->getId(), retrospectiveId: $retrospective->getId()) === false) {
+        if ($this->retrospectiveService->isRetrospectiveOwner(userId: $owner->getId(), retrospectiveId: $retrospective->getId()) === false) {
             throw new AccessDeniedException('You are not authorized to modify this retrospective.');
         }
 
@@ -97,7 +97,7 @@ class RetrospectiveParticipantService
             throw new NotFoundHttpException(message: "Retrospective resource with id: {$removeUserFromRetrospectiveInput->getRetrospectiveId()} not found");
         }
 
-        if ($this->retrospectiveService->isUserRetrospectiveOwner(userId: $owner->getId(), retrospectiveId: $retrospective->getId()) === false) {
+        if ($this->retrospectiveService->isRetrospectiveOwner(userId: $owner->getId(), retrospectiveId: $retrospective->getId()) === false) {
             throw new AccessDeniedException('You are not authorized to modify this retrospective.');
         }
 
@@ -162,7 +162,7 @@ class RetrospectiveParticipantService
         }
 
         // Check permissions - only owner or the participant themselves can update resource
-        $isOwner = $this->retrospectiveService->isUserRetrospectiveOwner($authorizedUser->getId(), $retrospective->getId());
+        $isOwner = $this->retrospectiveService->isRetrospectiveOwner($authorizedUser->getId(), $retrospective->getId());
         $isSelf = $participantUser->getId() === $authorizedUser->getId();
 
         if ($isOwner === false && $isSelf === false) {

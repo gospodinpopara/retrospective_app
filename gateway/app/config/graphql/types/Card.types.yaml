@@ -1,0 +1,66 @@
+Card:
+  type: object
+  config:
+    description: "Represents a card in a retrospective"
+    fields:
+      id:
+        type: "Int!"
+        description: "Unique identifier for the card"
+      title:
+        type: "String"
+        description: "Title of the card"
+      description:
+        type: "String"
+        description: "Detailed description of the card"
+      status:
+        type: "CardType!"
+        description: "Current status of the card"
+      createdAt:
+        type: "DateTime"
+        description: "Timestamp when the card was created"
+      updatedAt:
+        type: "DateTime"
+        description: "Timestamp when the card was last updated"
+      user:
+        type: "User"
+        description: "User who created the card"
+      #TODO total up votes -> do this with separate resolver
+
+CardInput:
+    type: input-object
+    config:
+      fields:
+        title:
+          type: "String!"
+          description: "Title of the card"
+        description:
+          type: "String!"
+          description: "Detailed description of the card"
+        status:
+          type: "CardType!"
+          description: "Current status of the card"
+
+CardType:
+  type: enum
+  config:
+    description: "Available types for a card"
+    values:
+      stop:
+        description: "Represents something to stop doing"
+        value: stop
+      less:
+        description: "Represents something to do less of"
+        value: less
+      keep:
+        description: "Represents something to keep doing"
+        value: keep
+      more:
+        description: "Represents something to do more of"
+        value: more
+      start:
+        description: "Represents something to start doing"
+        value: start
+
+
+
+

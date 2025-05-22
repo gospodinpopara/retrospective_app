@@ -24,6 +24,21 @@ Retrospective:
       updatedAt:
         type: "DateTime!"
         description: "Timestamp of the last update"
+      retrospectiveParticipants:
+        type: "[RetrospectiveParticipant]"
+        description: "List of participants in the retrospective"
+
+RetrospectiveCollectionResponse:
+  type: object
+  config:
+    description: "A paginated collection of retrospectives"
+    fields:
+      data:
+        type: "[Retrospective]"
+        description: "The list of retrospectives in the current page"
+      pagination:
+        type: "Pagination"
+        description: "Pagination details for the current page"
 
 RetrospectiveStatus:
   type: enum
@@ -87,3 +102,17 @@ RetrospectiveUpdateResponse:
       success: "Boolean"
       errors: "ValidationError"
       retrospective: "Retrospective"
+
+RetrospectiveFiltersInput:
+  type: input-object
+  config:
+    fields:
+      page:
+        type: "Int"
+        description: "Page number for pagination"
+      itemsPerPage:
+        type: "Int"
+        description: "Number of items per page"
+      isOwner:
+        type: "Boolean"
+        description: "Filter by ownership of the retrospective"

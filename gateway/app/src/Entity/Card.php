@@ -14,6 +14,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: CardRepository::class)]
 class Card
 {
+    public const string TYPE_STOP = 'stop';
+    public const string TYPE_LESS = 'less';
+    public const string TYPE_KEEP = 'keep';
+    public const string TYPE_MORE = 'more';
+    public const string TYPE_START = 'start';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -91,7 +97,9 @@ class Card
 
     public function setType(string $type): static
     {
-        $this->type = $type;
+        if (!\in_array($type, [self::TYPE_STOP, self::TYPE_LESS, self::TYPE_KEEP, self::TYPE_MORE, self::TYPE_START], true)) {
+            throw new \InvalidArgumentException('Invalid status provided');
+        }
 
         return $this;
     }
