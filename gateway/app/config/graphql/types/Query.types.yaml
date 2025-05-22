@@ -6,3 +6,13 @@ Query:
       user:
         type: "User"
         resolve: '@=query("App\\GraphQL\\Resolver\\UserResolver::getUser")'
+      retrospective:
+        type: "Retrospective"
+        args:
+          id: "Int!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\RetrospectiveResolver::getRetrospective", args)'
+      retrospectives:
+        type: "RetrospectiveCollectionResponse"
+        args:
+          filters: "RetrospectiveFiltersInput"
+        resolve: '@=query("App\\GraphQL\\Resolver\\RetrospectiveResolver::getRetrospectives", args)'

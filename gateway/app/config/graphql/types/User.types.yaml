@@ -6,6 +6,12 @@ User:
       id:
         type: "Int!"
         description: "The unique identifier of the user"
+      firstName:
+        type: "String!"
+        description: "The first name of the user"
+      lastName:
+        type: "String!"
+        description: "The last name of the user"
       email:
         type: "String!"
         description: "The email address used for user authentication and communication"

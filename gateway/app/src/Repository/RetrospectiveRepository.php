@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\DTO\Filter\RetrospectiveFilter;
 use App\Entity\Retrospective;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -24,7 +26,7 @@ class RetrospectiveRepository extends ServiceEntityRepository
      *
      * @return bool
      */
-    public function isRetrospectiveOwner(int $userId, int $retrospectiveId): bool
+    public function isUserRetrospectiveOwner(int $userId, int $retrospectiveId): bool
     {
         $result = $this->createQueryBuilder('r')
             ->select('COUNT(r.id)')
@@ -59,6 +61,52 @@ class RetrospectiveRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         return (int) $result > 0;
+    }
+
+    /**
+     * @param RetrospectiveFilter $filter
+     * @param int                 $userId
+     *
+     * @return array
+     */
+    public function getUserRetrospectives(RetrospectiveFilter $filter, int $userId): array
+    {
+        $queryBuilder = $this->createQueryBuilder('r')
+            ->leftJoin('r.retrospectiveParticipants', 'rp')
+            ->leftJoin('rp.user', 'participant');
+
+        if ($filter->getIsOwner() === true) {
+            $queryBuilder->andWhere('r.owner = :userId');
+        } elseif ($filter->getIsOwner() === false) {
+            $queryBuilder->andWhere('participant.id = :userId');
+        } else {
+            $queryBuilder->andWhere('r.owner = :userId OR participant.id = :userId');
+        }
+
+        $queryBuilder->setParameter('userId', $userId);
+
+        $currentPage = $filter->getPage();
+        $itemsPerPage = $filter->getItemsPerPage();
+
+        $queryBuilder
+            ->setFirstResult(($currentPage - 1) * $itemsPerPage)
+            ->setMaxResults($itemsPerPage);
+
+        $doctrinePaginator = new Paginator($queryBuilder->getQuery(), true);
+
+        $totalItems = \count($doctrinePaginator);
+        $paginatedResults = [];
+        foreach ($doctrinePaginator as $result) {
+            $paginatedResults[] = $result;
+        }
+
+        return [
+            'items' => $paginatedResults,
+            'currentPage' => $currentPage,
+            'itemsPerPage' => $itemsPerPage,
+            'totalItems' => $totalItems,
+            'totalPages' => (int) ceil($totalItems / $itemsPerPage),
+        ];
     }
 
     //    /**

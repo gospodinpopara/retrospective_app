@@ -17,6 +17,7 @@ class Retrospective
     public const string STATUS_SCHEDULED = 'scheduled';
     public const string STATUS_FINISHED = 'finished';
     public const string STATUS_CANCELLED = 'cancelled';
+    public const string STATUS_ACTIVE = 'active';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -111,7 +112,7 @@ class Retrospective
 
     public function setStatus(string $status): static
     {
-        if (!\in_array($status, [self::STATUS_SCHEDULED, self::STATUS_FINISHED, self::STATUS_CANCELLED])) {
+        if (!\in_array($status, [self::STATUS_SCHEDULED, self::STATUS_FINISHED, self::STATUS_CANCELLED, self::STATUS_ACTIVE], true)) {
             throw new \InvalidArgumentException('Invalid status provided');
         }
 

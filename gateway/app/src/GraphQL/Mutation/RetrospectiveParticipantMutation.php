@@ -29,11 +29,6 @@ class RetrospectiveParticipantMutation implements MutationInterface
     ) {
     }
 
-    public function updateUserRetrospective(): array
-    {
-        return [];
-    }
-
     /**
      * @param Argument $args
      *

@@ -9,14 +9,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class RetrospectiveUpdateInput
 {
-    #[Assert\NotBlank(message: 'Title cannot be empty')]
     #[Assert\Length(
         max: 255,
         maxMessage: 'Title cannot be longer than {{ limit }} characters',
     )]
     private ?string $title;
 
-    #[Assert\NotBlank(message: 'Description cannot be empty')]
     #[Assert\Length(
         max: 512,
         maxMessage: 'Description cannot be longer than {{ limit }} characters',
@@ -30,7 +28,7 @@ class RetrospectiveUpdateInput
     )]
     private ?\DateTimeInterface $startTime;
 
-    #[Assert\Choice(choices: [Retrospective::STATUS_SCHEDULED, Retrospective::STATUS_CANCELLED, Retrospective::STATUS_FINISHED])]
+    #[Assert\Choice(choices: [Retrospective::STATUS_SCHEDULED, Retrospective::STATUS_CANCELLED, Retrospective::STATUS_FINISHED, Retrospective::STATUS_ACTIVE])]
     private ?string $status;
 
     public function __construct(?string $title, ?string $description, ?\DateTimeInterface $startTime, ?string $status)

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\DTO\Filter\RetrospectiveFilter;
 use App\DTO\Input\Retrospective\RetrospectiveCreateInput;
 use App\DTO\Input\Retrospective\RetrospectiveUpdateInput;
 use App\DTO\Response\Retrospective\RetrospectiveCreateMutationResponse;
@@ -71,7 +72,7 @@ class RetrospectiveService
             throw new NotFoundHttpException(message: "Retrospective resource with id: {$id} not found");
         }
 
-        if ($this->isUserRetrospectiveOwner(userId: $user->getId(), retrospectiveId: $retrospective->getId()) === false) {
+        if ($this->isRetrospectiveOwner(userId: $user->getId(), retrospectiveId: $retrospective->getId()) === false) {
             throw new AccessDeniedException('You are not authorized to modify this retrospective.');
         }
 
@@ -118,7 +119,7 @@ class RetrospectiveService
             throw new NotFoundHttpException(message: "Retrospective resource with id: {$id} not found");
         }
 
-        if ($this->isUserRetrospectiveOwner(userId: $user->getId(), retrospectiveId: $retrospective->getId()) === false) {
+        if ($this->isRetrospectiveOwner(userId: $user->getId(), retrospectiveId: $retrospective->getId()) === false) {
             throw new AccessDeniedException('You are not authorized to modify this retrospective.');
         }
 
@@ -134,8 +135,64 @@ class RetrospectiveService
      *
      * @return bool
      */
-    public function isUserRetrospectiveOwner(int $userId, int $retrospectiveId): bool
+    public function isRetrospectiveOwner(int $userId, int $retrospectiveId): bool
     {
-        return $this->retrospectiveRepository->isRetrospectiveOwner(userId: $userId, retrospectiveId: $retrospectiveId);
+        return $this->retrospectiveRepository->isUserRetrospectiveOwner(userId: $userId, retrospectiveId: $retrospectiveId);
+    }
+
+    /**
+     * @param int $userId
+     * @param int $retrospectiveId
+     *
+     * @return bool
+     */
+    public function isUserRetrospectiveParticipant(int $userId, int $retrospectiveId): bool
+    {
+        return $this->retrospectiveRepository->isUserRetrospectiveParticipant(userId: $userId, retrospectiveId: $retrospectiveId);
+    }
+
+    /**
+     * @param int  $retrospectiveId
+     * @param User $user
+     *
+     * @return Retrospective
+     */
+    public function getUserRetrospective(int $retrospectiveId, User $user): Retrospective
+    {
+        $retrospective = $this->retrospectiveRepository->find($retrospectiveId);
+
+        if ($retrospective === null) {
+            throw new NotFoundHttpException(message: "Retrospective resource with id: {$retrospectiveId} not found");
+        }
+
+        $isOwner = $this->isRetrospectiveOwner(userId: $user->getId(), retrospectiveId: $retrospectiveId);
+        $isParticipant = $this->isUserRetrospectiveParticipant(userId: $user->getId(), retrospectiveId: $retrospectiveId);
+
+        if (!$isOwner && !$isParticipant) {
+            throw new AccessDeniedException('You are not authorized to access this retrospective.');
+        }
+
+        return $retrospective;
+    }
+
+    /**
+     * @param int $retrospectiveId
+     *
+     * @return Retrospective
+     */
+    public function getRetrospective(int $retrospectiveId): Retrospective
+    {
+        return $this->retrospectiveRepository->find($retrospectiveId);
+    }
+
+    /**
+     * @param RetrospectiveFilter $filter
+     * @param User                $user
+     *
+     * @return array
+     */
+    public function getUserRetrospectives(RetrospectiveFilter $filter, User $user): array
+    {
+        return $this->retrospectiveRepository->getUserRetrospectives($filter, $user->getId());
     }
 }

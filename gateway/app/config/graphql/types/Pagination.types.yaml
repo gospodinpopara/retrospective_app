@@ -1,0 +1,17 @@
+Pagination:
+  type: object
+  config:
+    description: "Pagination details for paginated responses"
+    fields:
+      currentPage:
+        type: "Int"
+        description: "The current page number"
+      itemsPerPage:
+        type: "Int"
+        description: "The number of items per page"
+      totalItems:
+        type: "Int"
+        description: "The total number of items"
+      totalPages:
+        type: "Int"
+        description: "The total number of pages"
