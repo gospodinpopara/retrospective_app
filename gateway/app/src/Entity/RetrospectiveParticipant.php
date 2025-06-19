@@ -17,6 +17,12 @@ class RetrospectiveParticipant
     public const string STATUS_ACCEPTED = 'accepted';
     public const string STATUS_DECLINED = 'declined';
 
+    public const STATUS_OPTIONS = [
+        self::STATUS_PENDING,
+        self::STATUS_ACCEPTED,
+        self::STATUS_DECLINED,
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

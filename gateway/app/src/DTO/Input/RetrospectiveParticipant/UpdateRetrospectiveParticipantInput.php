@@ -12,7 +12,6 @@ class UpdateRetrospectiveParticipantInput
     #[Assert\NotBlank]
     #[Assert\Positive]
     private int $retrospectiveId;
-
     #[Assert\NotBlank]
     #[Assert\Positive]
     private int $participantId;

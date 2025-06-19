@@ -1,0 +1,8 @@
+OrderFilter:
+  type: "enum"
+  config:
+    values:
+      ASC:
+        description: "Order by ascending value"
+      DESC:
+        description: "Order by descending value"

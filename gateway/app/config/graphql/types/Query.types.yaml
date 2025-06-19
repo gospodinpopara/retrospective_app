@@ -16,3 +16,13 @@ Query:
         args:
           filters: "RetrospectiveFiltersInput"
         resolve: '@=query("App\\GraphQL\\Resolver\\RetrospectiveResolver::getRetrospectives", args)'
+      retrospectiveInvite:
+        type: "RetrospectiveInvite"
+        args:
+          id: "Int!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\RetrospectiveParticipantsResolver::getRetrospectiveInvite", args)'
+      retrospectiveInvites:
+        type: "RetrospectiveInviteCollectionResponse"
+        args:
+          filters: "RetrospectiveInviteFiltersInput"
+        resolve: '@=query("App\\GraphQL\\Resolver\\RetrospectiveParticipantsResolver::getRetrospectiveInvites", args)'

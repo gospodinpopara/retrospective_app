@@ -52,14 +52,6 @@ class RetrospectiveResolver implements QueryInterface
 
         $retrospectiveFilters = RetrospectiveFilter::createFromArray($argument->offsetGet('filters'));
 
-        $collection = $this->retrospectiveService->getUserRetrospectives($retrospectiveFilters, $user);
-
-        return new RetrospectiveCollectionResponse(
-            data: $collection['items'],
-            currentPage: $collection['currentPage'],
-            itemsPerPage: $collection['itemsPerPage'],
-            totalItems: $collection['totalItems'],
-            totalPages: $collection['totalPages'],
-        );
+        return $this->retrospectiveService->getUserRetrospectives($retrospectiveFilters, $user);
     }
 }

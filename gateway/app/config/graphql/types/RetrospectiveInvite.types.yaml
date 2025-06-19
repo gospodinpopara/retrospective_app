@@ -1,0 +1,44 @@
+RetrospectiveInvite:
+  type: object
+  config:
+    fields:
+      id:
+        type: "Int!"
+        description: "The unique identifier of the retrospective invite"
+      status:
+        type: "RetrospectiveParticipantStatus!"
+        description: "The status of the invite"
+      retrospective:
+        type: "Retrospective!"
+        description: "The retrospective associated with the invite"
+
+RetrospectiveInviteCollectionResponse:
+  type: object
+  config:
+    description: "Response type for a collection of retrospective invites"
+    fields:
+      data:
+        type: "[RetrospectiveInvite]"
+        description: "The list of retrospective invites in the current page"
+      pagination:
+        type: "Pagination"
+        description: "Pagination details for the current page"
+
+RetrospectiveInviteFiltersInput:
+  type: input-object
+  config:
+    fields:
+      page:
+        type: "Int"
+        description: "Page number for pagination"
+      itemsPerPage:
+        type: "Int"
+        description: "Number of items per page"
+      status:
+        type: "RetrospectiveParticipantStatus"
+        description: "Filter by the status of the retrospective invite"
+      orderByRetrospectiveStartTime:
+        type: "OrderFilter"
+        description: "Order by the start time of the retrospective"
+
+

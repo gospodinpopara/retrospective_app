@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\DTO\Filter\RetrospectiveInvitesFilter;
 use App\DTO\Input\RetrospectiveParticipant\InviteUserToRetrospectiveInput;
 use App\DTO\Input\RetrospectiveParticipant\RemoveUserFromRetrospectiveInput;
 use App\DTO\Input\RetrospectiveParticipant\UpdateRetrospectiveParticipantInput;
+use App\DTO\Response\Retrospective\RetrospectiveCollectionResponse;
 use App\DTO\Response\RetrospectiveParticipant\InviteRetrospectiveParticipantResponse;
 use App\DTO\Response\RetrospectiveParticipant\UpdateRetrospectiveParticipantResponse;
 use App\Entity\RetrospectiveParticipant;
 use App\Entity\User;
+use App\Model\RetrospectiveInvite;
 use App\Repository\RetrospectiveParticipantRepository;
 use App\Repository\RetrospectiveRepository;
 use App\Repository\UserRepository;
@@ -175,5 +178,48 @@ class RetrospectiveParticipantService
         $this->entityManager->flush();
 
         return UpdateRetrospectiveParticipantResponse::success(retrospectiveParticipant: $retrospectiveParticipant);
+    }
+
+    /**
+     * @param int  $id
+     * @param User $user
+     *
+     * @return RetrospectiveInvite
+     */
+    public function getRetrospectiveInvite(int $id, User $user): RetrospectiveInvite
+    {
+        $retrospectiveParticipant = $this->retrospectiveParticipantRepository->find($id);
+
+        if ($retrospectiveParticipant === null) {
+            throw new NotFoundHttpException('Retrospective invite not found');
+        }
+
+        if ($retrospectiveParticipant->getUser()->getId() !== $user->getId()) {
+            throw new AccessDeniedException('You are not authorized to view this retrospective invite');
+        }
+
+        return new RetrospectiveInvite()
+            ->setId($retrospectiveParticipant->getId())
+            ->setStatus($retrospectiveParticipant->getStatus())
+            ->setRetrospective($retrospectiveParticipant->getRetrospective());
+    }
+
+    /**
+     * @param User                       $user
+     * @param RetrospectiveInvitesFilter $filter
+     *
+     * @return RetrospectiveCollectionResponse
+     */
+    public function getRetrospectiveInvites(RetrospectiveInvitesFilter $filter, User $user): RetrospectiveCollectionResponse
+    {
+        $collection = $this->retrospectiveParticipantRepository->getUserRetrospectiveInvites($user, $filter);
+
+        return new RetrospectiveCollectionResponse(
+            data: $collection['items'],
+            currentPage: $collection['currentPage'],
+            itemsPerPage: $collection['itemsPerPage'],
+            totalItems: $collection['totalItems'],
+            totalPages: $collection['totalPages'],
+        );
     }
 }

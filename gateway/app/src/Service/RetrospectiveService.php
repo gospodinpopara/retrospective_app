@@ -7,6 +7,7 @@ namespace App\Service;
 use App\DTO\Filter\RetrospectiveFilter;
 use App\DTO\Input\Retrospective\RetrospectiveCreateInput;
 use App\DTO\Input\Retrospective\RetrospectiveUpdateInput;
+use App\DTO\Response\Retrospective\RetrospectiveCollectionResponse;
 use App\DTO\Response\Retrospective\RetrospectiveCreateMutationResponse;
 use App\DTO\Response\Retrospective\RetrospectiveUpdateMutationResponse;
 use App\Entity\Retrospective;
@@ -189,10 +190,18 @@ class RetrospectiveService
      * @param RetrospectiveFilter $filter
      * @param User                $user
      *
-     * @return array
+     * @return RetrospectiveCollectionResponse
      */
-    public function getUserRetrospectives(RetrospectiveFilter $filter, User $user): array
+    public function getUserRetrospectives(RetrospectiveFilter $filter, User $user): RetrospectiveCollectionResponse
     {
-        return $this->retrospectiveRepository->getUserRetrospectives($filter, $user->getId());
+        $collection = $this->retrospectiveRepository->getUserRetrospectives($filter, $user->getId());
+
+        return new RetrospectiveCollectionResponse(
+            data: $collection['items'],
+            currentPage: $collection['currentPage'],
+            itemsPerPage: $collection['itemsPerPage'],
+            totalItems: $collection['totalItems'],
+            totalPages: $collection['totalPages'],
+        );
     }
 }
