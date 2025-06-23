@@ -12,7 +12,7 @@ Card:
       description:
         type: "String"
         description: "Detailed description of the card"
-      status:
+      type:
         type: "CardType!"
         description: "Current status of the card"
       createdAt:
@@ -22,23 +22,9 @@ Card:
         type: "DateTime"
         description: "Timestamp when the card was last updated"
       user:
-        type: "User"
+        type: "Participant"
         description: "User who created the card"
       #TODO total up votes -> do this with separate resolver
-
-CardInput:
-    type: input-object
-    config:
-      fields:
-        title:
-          type: "String!"
-          description: "Title of the card"
-        description:
-          type: "String!"
-          description: "Detailed description of the card"
-        status:
-          type: "CardType!"
-          description: "Current status of the card"
 
 CardType:
   type: enum
@@ -61,6 +47,56 @@ CardType:
         description: "Represents something to start doing"
         value: start
 
+CardCreateInput:
+  type: input-object
+  config:
+    fields:
+      title:
+        type: "String!"
+        description: "Title of the card"
+      description:
+        type: "String!"
+        description: "Detailed description of the card"
+      type:
+        type: "CardType!"
+        description: "Current status of the card"
+      retrospectiveId:
+        type: "Int!"
+        description: "ID of the retrospective this card belongs to"
+
+RetrospectiveCardCreateResponse:
+  type: object
+  config:
+    fields:
+      success: "Boolean"
+      errors: "ValidationError"
+      card: "Card"
+
+CardUpdateInput:
+    type: input-object
+    config:
+      fields:
+        cardId:
+          type: "Int!"
+          description: "ID of the card to update"
+        title:
+          type: "String"
+          description: "Title of the card"
+        description:
+          type: "String"
+          description: "Detailed description of the card"
+        type:
+          type: "CardType"
+          description: "Current status of the card"
+
+
+RetrospectiveCardUpdateResponse:
+    type: object
+    config:
+      fields:
+        success: "Boolean"
+        errors: "ValidationError"
+        card: "Card"
 
 
 

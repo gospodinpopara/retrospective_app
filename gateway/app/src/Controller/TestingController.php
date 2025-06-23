@@ -15,9 +15,9 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 class TestingController extends AbstractController
 {
     public function __construct(
-//        private readonly Security $security,
-//        private readonly RetrospectiveParticipantService $retrospectiveParticipantService,
-//        private readonly UserRepository $userRepository,
+        //        private readonly Security $security,
+        //        private readonly RetrospectiveParticipantService $retrospectiveParticipantService,
+        //        private readonly UserRepository $userRepository,
     ) {
     }
 
@@ -27,8 +27,6 @@ class TestingController extends AbstractController
     #[Route('/testing', name: 'testing')]
     public function test(): JsonResponse
     {
-        return new JsonResponse([
-
-        ]);
+        return new JsonResponse([]);
     }
 }

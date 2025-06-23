@@ -8,4 +8,8 @@ use Overblog\GraphQLBundle\Definition\Resolver\QueryInterface;
 
 class RetrospectiveCardResolver implements QueryInterface
 {
+    public function getRetrospectiveCard(): array
+    {
+        return [];
+    }
 }

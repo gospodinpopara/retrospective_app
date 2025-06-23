@@ -27,6 +27,11 @@ Retrospective:
       retrospectiveParticipants:
         type: "[RetrospectiveParticipant]"
         description: "List of participants in the retrospective"
+      cards:
+        type: "[Card]"
+        description: "List of cards associated with the retrospective"
+
+
 
 RetrospectiveCollectionResponse:
   type: object

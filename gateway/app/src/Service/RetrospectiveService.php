@@ -38,7 +38,6 @@ class RetrospectiveService
      */
     public function createRetrospective(RetrospectiveCreateInput $retrospectiveCreateInput, User $user): RetrospectiveCreateMutationResponse
     {
-        // Validate input
         $validationErrors = $this->validator->validate($retrospectiveCreateInput);
 
         if (\count($validationErrors) > 0) {
