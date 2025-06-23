@@ -20,6 +20,14 @@ class Card
     public const string TYPE_MORE = 'more';
     public const string TYPE_START = 'start';
 
+    public const array CARD_TYPES = [
+        self::TYPE_STOP,
+        self::TYPE_LESS,
+        self::TYPE_KEEP,
+        self::TYPE_MORE,
+        self::TYPE_START,
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -100,6 +108,8 @@ class Card
         if (!\in_array($type, [self::TYPE_STOP, self::TYPE_LESS, self::TYPE_KEEP, self::TYPE_MORE, self::TYPE_START], true)) {
             throw new \InvalidArgumentException('Invalid status provided');
         }
+
+        $this->type = $type;
 
         return $this;
     }

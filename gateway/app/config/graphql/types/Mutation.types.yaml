@@ -55,9 +55,27 @@ Mutation:
         resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveParticipantMutation::deleteRetrospectiveParticipantMutation", args)'
       updateRetrospectiveParticipant:
         type: "UpdateRetrospectiveParticipantResponse"
-        description: ""
+        description: "Update retrospective participant status"
         args:
           retrospectiveId: "Int!"
           participantId: "Int!"
           status: "RetrospectiveParticipantStatus!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveParticipantMutation::updateRetrospectiveParticipantMutation", args)'
+      createRetrospectiveCard:
+        type: "RetrospectiveCardCreateResponse"
+        description: "Create card"
+        args:
+          cardCreateInput: "CardCreateInput!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveCardMutation::createRetrospectiveCardMutation", args)'
+      updateRetrospectiveCard:
+        type: "RetrospectiveCardUpdateResponse"
+        description: "Update retrospective card"
+        args:
+          cardUpdateInput: "CardUpdateInput!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveCardMutation::updateRetrospectiveCardMutation", args)'
+      deleteRetrospectiveCard:
+        type: "Boolean"
+        description: "Delete retrospective card"
+        args:
+          id: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveCardMutation::deleteRetrospectiveCardMutation", args)'

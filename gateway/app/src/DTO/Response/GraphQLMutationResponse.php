@@ -7,6 +7,7 @@ namespace App\DTO\Response;
 class GraphQLMutationResponse
 {
     protected bool $success;
+
     protected ?array $errors;
 
     protected function __construct(bool $success, ?array $errors = [])
