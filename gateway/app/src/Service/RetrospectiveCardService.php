@@ -9,9 +9,13 @@ use App\DTO\Input\Card\CardUpdateInput;
 use App\DTO\Response\RetrospectiveCard\RetrospectiveCardCreateMutationResponse;
 use App\DTO\Response\RetrospectiveCard\RetrospectiveCardUpdateMutationResponse;
 use App\Entity\Card;
+use App\Entity\CardUpvote;
 use App\Entity\Retrospective;
+use App\Entity\RetrospectiveParticipant;
 use App\Entity\User;
 use App\Exception\RetrospectiveNotActiveException;
+use App\Repository\CardRepository;
+use App\Repository\CardUpvoteRepository;
 use App\Repository\RetrospectiveRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -22,8 +26,36 @@ class RetrospectiveCardService
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly RetrospectiveRepository $retrospectiveRepository,
-        private readonly RetrospectiveService $retrospectiveService
+        private readonly RetrospectiveService $retrospectiveService,
+        private readonly CardRepository $cardRepository,
+        private readonly CardUpvoteRepository $cardUpvoteRepository
     ) {
+    }
+
+    /**
+     * @param int  $cardId
+     * @param User $user
+     *
+     * @return Card
+     */
+    public function getRetrospectiveCard(int $cardId, User $user): Card
+    {
+        $card = $this->cardRepository->find($cardId);
+
+        if ($card === null) {
+            throw new NotFoundHttpException("Card with ID {$cardId} not found.");
+        }
+
+        $retrospective = $card->getRetrospective();
+
+        $isOwner = $this->retrospectiveService->isRetrospectiveOwner(userId: $user->getId(), retrospectiveId: $retrospective->getId());
+        $isParticipant = $this->retrospectiveService->isUserRetrospectiveParticipant(userId: $user->getId(), retrospectiveId: $retrospective->getId(), status: RetrospectiveParticipant::STATUS_ACCEPTED);
+
+        if (!$isOwner && !$isParticipant) {
+            throw new AccessDeniedException('You are not authorized to access this retrospective.');
+        }
+
+        return $card;
     }
 
     /**
@@ -49,7 +81,7 @@ class RetrospectiveCardService
         }
 
         $isOwner = $this->retrospectiveService->isRetrospectiveOwner(userId: $user->getId(), retrospectiveId: $input->getRetrospectiveId());
-        $isParticipant = $this->retrospectiveService->isUserRetrospectiveParticipant(userId: $user->getId(), retrospectiveId: $input->getRetrospectiveId());
+        $isParticipant = $this->retrospectiveService->isUserRetrospectiveParticipant(userId: $user->getId(), retrospectiveId: $input->getRetrospectiveId(), status: RetrospectiveParticipant::STATUS_ACCEPTED);
 
         if (!$isOwner && !$isParticipant) {
             throw new AccessDeniedException('You are not authorized to access this retrospective.');
@@ -149,6 +181,63 @@ class RetrospectiveCardService
         }
 
         $this->entityManager->remove($card);
+        $this->entityManager->flush();
+
+        return true;
+    }
+
+    /**
+     * @param int  $cardId
+     * @param User $user
+     *
+     * @return bool
+     *
+     * @throws RetrospectiveNotActiveException
+     * @throws AccessDeniedException
+     * @throws NotFoundHttpException
+     */
+    public function toggleRetrospectiveCardUpvote(int $cardId, User $user): bool
+    {
+        $card = $this->cardRepository->find($cardId);
+
+        if ($card === null) {
+            throw new NotFoundHttpException("Card with ID {$cardId} not found.");
+        }
+
+        if ($card->getUser()->getId() === $user->getId()) {
+            throw new AccessDeniedException('You cannot upvote your own card.');
+        }
+
+        $retrospective = $card->getRetrospective();
+
+        if ($retrospective->getStatus() !== Retrospective::STATUS_ACTIVE) {
+            throw new RetrospectiveNotActiveException(message: 'Retrospective is not active.');
+        }
+
+        $isOwner = $this->retrospectiveService->isRetrospectiveOwner(userId: $user->getId(), retrospectiveId: $retrospective->getId());
+        $isParticipant = $this->retrospectiveService->isUserRetrospectiveParticipant(userId: $user->getId(), retrospectiveId: $retrospective->getId(), status: RetrospectiveParticipant::STATUS_ACCEPTED);
+
+        if (!$isOwner && !$isParticipant) {
+            throw new AccessDeniedException('You are not authorized to access this retrospective.');
+        }
+
+        $existingUpvote = $this->cardUpvoteRepository->findOneBy([
+            'card' => $card,
+            'user' => $user,
+        ]);
+
+        if ($existingUpvote) {
+            $this->entityManager->remove($existingUpvote);
+            $this->entityManager->flush();
+
+            return true;
+        }
+
+        $cardUpvote = new CardUpvote();
+        $cardUpvote->setCard($card)
+            ->setUser($user);
+
+        $this->entityManager->persist($cardUpvote);
         $this->entityManager->flush();
 
         return true;

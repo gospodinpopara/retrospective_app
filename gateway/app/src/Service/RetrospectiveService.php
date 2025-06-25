@@ -11,6 +11,7 @@ use App\DTO\Response\Retrospective\RetrospectiveCollectionResponse;
 use App\DTO\Response\Retrospective\RetrospectiveCreateMutationResponse;
 use App\DTO\Response\Retrospective\RetrospectiveUpdateMutationResponse;
 use App\Entity\Retrospective;
+use App\Entity\RetrospectiveParticipant;
 use App\Entity\User;
 use App\Repository\RetrospectiveRepository;
 use App\Utils\ValidationErrorFormatter;
@@ -141,14 +142,15 @@ class RetrospectiveService
     }
 
     /**
-     * @param int $userId
-     * @param int $retrospectiveId
+     * @param int         $userId
+     * @param int         $retrospectiveId
+     * @param string|null $status
      *
      * @return bool
      */
-    public function isUserRetrospectiveParticipant(int $userId, int $retrospectiveId): bool
+    public function isUserRetrospectiveParticipant(int $userId, int $retrospectiveId, ?string $status = null): bool
     {
-        return $this->retrospectiveRepository->isUserRetrospectiveParticipant(userId: $userId, retrospectiveId: $retrospectiveId);
+        return $this->retrospectiveRepository->isUserRetrospectiveParticipant(userId: $userId, retrospectiveId: $retrospectiveId, status: $status);
     }
 
     /**
@@ -166,7 +168,7 @@ class RetrospectiveService
         }
 
         $isOwner = $this->isRetrospectiveOwner(userId: $user->getId(), retrospectiveId: $retrospectiveId);
-        $isParticipant = $this->isUserRetrospectiveParticipant(userId: $user->getId(), retrospectiveId: $retrospectiveId);
+        $isParticipant = $this->isUserRetrospectiveParticipant(userId: $user->getId(), retrospectiveId: $retrospectiveId, status: RetrospectiveParticipant::STATUS_ACCEPTED);
 
         if (!$isOwner && !$isParticipant) {
             throw new AccessDeniedException('You are not authorized to access this retrospective.');

@@ -1,0 +1,46 @@
+Participant:
+  type: object
+  config:
+    description: "Represents a retrospective participant with their status and user information"
+    fields:
+      id:
+        type: "Int!"
+        description: "The unique identifier of the user"
+      firstName:
+        type: "String!"
+        description: "The first name of the user"
+      lastName:
+        type: "String!"
+        description: "The last name of the user"
+      email:
+        type: "String!"
+        description: "The email address used for user authentication and communication"
+
+ParticipantFilterInput:
+  type: input-object
+  config:
+    description: "Filters for querying participants"
+    fields:
+      firstName:
+        type: "String"
+        description: "Filter by the first name of the participant"
+      lastName:
+        type: "String"
+        description: "Filter by the last name of the participant"
+      email:
+        type: "String"
+        description: "Filter by the email address of the participant"
+      status:
+        type: "String"
+        description: "Filter by the status of the participant"
+
+ParticipantCollectionCollectionResponse:
+  type: object
+  config:
+    fields:
+      data:
+        type: "[Participant]"
+        description: "The list of participants in the current page"
+      pagination:
+        type: "Pagination"
+        description: "Pagination details for the current page"

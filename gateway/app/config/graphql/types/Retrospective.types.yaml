@@ -32,7 +32,6 @@ Retrospective:
         description: "List of cards associated with the retrospective"
 
 
-
 RetrospectiveCollectionResponse:
   type: object
   config:

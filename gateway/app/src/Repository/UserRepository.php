@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\DTO\Filter\ParticipantFilter;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -43,6 +45,58 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setParameter('email', $email)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * @param ParticipantFilter $filters
+     * @param User              $user
+     *
+     * @return array
+     */
+    public function searchParticipants(ParticipantFilter $filters, User $user): array
+    {
+        $queryBuilder = $this->createQueryBuilder('u');
+
+        $queryBuilder->andWhere('u.id != :currentUserId')
+            ->setParameter('currentUserId', $user->getId());
+
+        if ($filters->getEmail()) {
+            $queryBuilder->andWhere('u.email LIKE :email')
+                ->setParameter('email', '%'.$filters->getEmail().'%');
+        }
+
+        if ($filters->getFirstName()) {
+            $queryBuilder->andWhere('u.firstName LIKE :firstName')
+                ->setParameter('firstName', '%'.$filters->getFirstName().'%');
+        }
+
+        if ($filters->getLastName()) {
+            $queryBuilder->andWhere('u.lastName LIKE :lastName')
+                ->setParameter('lastName', '%'.$filters->getLastName().'%');
+        }
+
+        $currentPage = $filters->getPage();
+        $itemsPerPage = $filters->getItemsPerPage();
+
+        $queryBuilder
+            ->setFirstResult(($currentPage - 1) * $itemsPerPage)
+            ->setMaxResults($itemsPerPage);
+
+        $doctrinePaginator = new Paginator($queryBuilder->getQuery(), true);
+
+        $totalItems = \count($doctrinePaginator);
+        $paginatedResults = [];
+        foreach ($doctrinePaginator as $result) {
+            $paginatedResults[] = $result;
+        }
+
+        return [
+            'items' => $paginatedResults,
+            'currentPage' => $currentPage,
+            'itemsPerPage' => $itemsPerPage,
+            'totalItems' => $totalItems,
+            'totalPages' => (int) ceil($totalItems / $itemsPerPage),
+        ];
     }
 
     //    /**

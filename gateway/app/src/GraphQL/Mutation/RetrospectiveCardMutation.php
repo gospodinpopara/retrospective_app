@@ -97,4 +97,26 @@ class RetrospectiveCardMutation implements MutationInterface
             throw new UserError(message: 'Access Denied: '.$exception->getMessage(), code: Response::HTTP_FORBIDDEN);
         }
     }
+
+    /**
+     * @param Argument $args
+     *
+     * @return bool
+     *
+     * @throws RetrospectiveNotActiveException
+     */
+    public function toggleRetrospectiveCardUpvoteMutation(Argument $args): bool
+    {
+        $user = $this->getAuthenticatedUser($this->security);
+
+        try {
+            return $this->retrospectiveCardService->toggleRetrospectiveCardUpvote(cardId: $args->offsetGet('cardId'), user: $user);
+        } catch (NotFoundHttpException $exception) {
+            throw new UserError(message: 'Card Not Found: '.$exception->getMessage(), code: Response::HTTP_NOT_FOUND);
+        } catch (RetrospectiveNotActiveException) {
+            throw new UserError(message: 'Retrospective is not active.', code: Response::HTTP_BAD_REQUEST);
+        } catch (AccessDeniedException $exception) {
+            throw new UserError(message: 'Access Denied: '.$exception->getMessage(), code: Response::HTTP_FORBIDDEN);
+        }
+    }
 }

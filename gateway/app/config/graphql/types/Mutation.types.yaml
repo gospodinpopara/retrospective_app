@@ -79,3 +79,9 @@ Mutation:
         args:
           id: "Int!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveCardMutation::deleteRetrospectiveCardMutation", args)'
+      retrospectiveCardUpvoteToggle:
+        type: "Boolean"
+        description: "Toggle upvote for a retrospective card"
+        args:
+          cardId: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveCardMutation::toggleRetrospectiveCardUpvoteMutation", args)'
