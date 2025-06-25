@@ -68,6 +68,31 @@ services:
   ################# NOTIFICATION SERVICE CONFIG #################
 
   # TODO -> SETUP Notification service
+  notification-php84-service:
+    container_name: notification-retrospective
+    build:
+      context: .
+      dockerfile: ./notification-service/php/Dockerfile
+    volumes:
+      - ./notification-service/app:/var/www/project
+    networks:
+      - retrospective-network
+    environment:
+      PHP_CS_FIXER_IGNORE_ENV: 1 #cs fixer still don't support php 8.4, fix flag
+      API_KEY: 'f8JhT7kL9pQ2mN4rX6yC1bV3zG5aW0oU'
+
+  notification-nginx-service:
+    image: nginx:stable-alpine
+    container_name: notification-retrospective-nginx
+    ports:
+      - "8082:80"
+    volumes:
+      - ./notification-service/app:/var/www/project
+      - ./notification-service/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - notification-php84-service
+    networks:
+      - retrospective-network
 
   ################# MAILER SERVICE CONFIG #######################
 
