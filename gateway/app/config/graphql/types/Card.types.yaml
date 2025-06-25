@@ -24,7 +24,22 @@ Card:
       user:
         type: "Participant"
         description: "User who created the card"
-      #TODO total up votes -> do this with separate resolver
+      cardUpvotes:
+        type: "[CardUpvote]"
+        description: "List of upvotes users for the card"
+
+CardUpvote:
+  type: object
+  config:
+    fields:
+      id:
+        type: "Int!"
+      user:
+        type: "Participant!"
+      createdAt:
+        type: "DateTime!"
+      updatedAt:
+        type: "DateTime!"
 
 CardType:
   type: enum

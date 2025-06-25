@@ -19,4 +19,9 @@ class UserResolver implements QueryInterface
     {
         return $this->security->getUser();
     }
+
+    public function getParticipantsCollection(): array
+    {
+        return [];
+    }
 }

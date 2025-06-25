@@ -26,3 +26,13 @@ Query:
         args:
           filters: "RetrospectiveInviteFiltersInput"
         resolve: '@=query("App\\GraphQL\\Resolver\\RetrospectiveParticipantsResolver::getRetrospectiveInvites", args)'
+      retrospectiveCard:
+        type: "Card"
+        args:
+          id: "Int!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\RetrospectiveCardResolver::getRetrospectiveCard", args)'
+      participants:
+        type: "ParticipantCollectionCollectionResponse"
+        args:
+          filters: "ParticipantFilterInput"
+        resolve: '@=query("App\\GraphQL\\Resolver\\ParticipantResolver::getParticipants", args)'

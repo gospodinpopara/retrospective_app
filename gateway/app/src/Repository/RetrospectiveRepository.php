@@ -42,23 +42,29 @@ class RetrospectiveRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param int $userId
-     * @param int $retrospectiveId
+     * @param int         $userId
+     * @param int         $retrospectiveId
+     * @param string|null $status
      *
      * @return bool
      */
-    public function isUserRetrospectiveParticipant(int $userId, int $retrospectiveId): bool
+    public function isUserRetrospectiveParticipant(int $userId, int $retrospectiveId, ?string $status): bool
     {
-        $result = $this->createQueryBuilder('r')
+        $queryBuilder = $this->createQueryBuilder('r')
             ->select('COUNT(rp.id)')
             ->join('r.retrospectiveParticipants', 'rp')
             ->join('rp.user', 'u')
             ->where('r.id = :retrospectiveId')
             ->andWhere('u.id = :userId')
             ->setParameter('retrospectiveId', $retrospectiveId)
-            ->setParameter('userId', $userId)
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->setParameter('userId', $userId);
+
+        if ($status !== null) {
+            $queryBuilder->andWhere('rp.status = :status')
+                ->setParameter('status', $status);
+        }
+
+        $result = $queryBuilder->getQuery()->getSingleScalarResult();
 
         return (int) $result > 0;
     }

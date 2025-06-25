@@ -22,24 +22,6 @@ RetrospectiveParticipant:
         type: "Retrospective!"
         description: "The retrospective the user is participating in"
 
-Participant:
-  type: object
-  config:
-    description: "Represents a retrospective participant with their status and user information"
-    fields:
-      id:
-        type: "Int!"
-        description: "The unique identifier of the user"
-      firstName:
-        type: "String!"
-        description: "The first name of the user"
-      lastName:
-        type: "String!"
-        description: "The last name of the user"
-      email:
-        type: "String!"
-        description: "The email address used for user authentication and communication"
-
 RetrospectiveParticipantStatus:
   type: enum
   config:
