@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Security;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,11 +16,10 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class ApiKeyAuthenticator extends AbstractAuthenticator
 {
-
     public function __construct(
         private readonly string $apiKey
-    ) { }
-
+    ) {
+    }
 
     public function supports(Request $request): ?bool
     {
@@ -35,7 +36,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
 
         return new SelfValidatingPassport(new UserBadge(
             userIdentifier: AdminUser::IDENTIFIER,
-            userLoader: static fn () => new AdminUser()
+            userLoader: static fn () => new AdminUser(),
         ));
     }
 
@@ -47,7 +48,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $data = [
-            'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
+            'message' => strtr($exception->getMessageKey(), $exception->getMessageData()),
         ];
 
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);

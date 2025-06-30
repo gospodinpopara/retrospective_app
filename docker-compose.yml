@@ -36,7 +36,30 @@ services:
 
   ######################## RABBIT MQ #########################
 
-  # TODO -> SETUP RabbitMQ
+  retrospective-rabbitmq-service:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-retrospective
+    restart: unless-stopped
+    ports:
+      - "5672:5672"   # RabbitMQ default port
+      - "15672:15672" # Management UI port
+    environment:
+      RABBITMQ_DEFAULT_USER: retrospective
+      RABBITMQ_DEFAULT_PASS: retrospective
+    networks:
+      - retrospective-network
+
+  ######################## MAILER SERVICE  ##############################
+
+  retrospective-mailhog-service:
+    image: mailhog/mailhog
+    container_name: mailhog-retrospective
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP server
+      - "8025:8025" # Web UI
+    networks:
+      - retrospective-network
 
   ###################### GATEWAY CONFIG ######################
 
@@ -93,10 +116,6 @@ services:
       - notification-php84-service
     networks:
       - retrospective-network
-
-  ################# MAILER SERVICE CONFIG #######################
-
-  # TODO -> SETUP Mailer service
 
 
 volumes:
