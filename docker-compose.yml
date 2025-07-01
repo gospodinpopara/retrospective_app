@@ -74,6 +74,8 @@ services:
       - retrospective-network
     environment:
       PHP_CS_FIXER_IGNORE_ENV: 1 #cs fixer still don't support php 8.4, fix flag
+      NOTIFICATIONS_API_URL: 'http://notification-nginx-service:80'
+      NOTIFICATIONS_API_KEY: 'f8JhT7kL9pQ2mN4rX6yC1bV3zG5aW0oU'
 
   gateway-nginx-service:
     image: nginx:stable-alpine
@@ -120,6 +122,3 @@ services:
 
 volumes:
   mysql8-retrospective-data:
-
-
-#ENV

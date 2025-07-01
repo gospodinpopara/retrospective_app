@@ -36,3 +36,11 @@ Query:
         args:
           filters: "ParticipantFilterInput"
         resolve: '@=query("App\\GraphQL\\Resolver\\ParticipantResolver::getParticipants", args)'
+      latestUserNotifications:
+        type: "LatestUserNotificationsResponse"
+        resolve: '@=query("App\\GraphQL\\Resolver\\NotificationResolver::resolveLatestUserNotifications")'
+      userNotifications:
+        type: "UserNotificationCollectionResponse"
+        args:
+          filters: "UserNotificationFiltersInput"
+        resolve: '@=query("App\\GraphQL\\Resolver\\NotificationResolver::resolveUserNotifications", args)'
