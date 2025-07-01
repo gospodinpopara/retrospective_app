@@ -88,7 +88,7 @@ class UserNotificationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function setAllAsServed(int $userId): bool
+    public function setAllAsServed(int $userId): int
     {
         return $this->createQueryBuilder('un')
             ->update()

@@ -62,7 +62,12 @@ class UserNotificationController extends AbstractController
             $notAckedCount = $this->userNotificationRepository->getNotAckedCount(userId: $userId);
             $notVisitedCount = $this->userNotificationRepository->getNotVisitedCount(userId: $userId);
             $latestNotifications = $this->userNotificationRepository->getLatestActiveUserNotifications(userId: $userId);
+
+            // Convert pending generic notifications to personal notifications
             $this->siteNotificationService->convertPendingGenericNotificationsToPersonal($userId);
+
+            // Set notifications as served
+            $this->userNotificationRepository->setAllAsServed($userId);
 
             $responseDto = new LatestUserNotificationsDto(
                 notAckedCount: $notAckedCount,
