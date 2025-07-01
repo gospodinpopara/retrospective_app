@@ -18,8 +18,6 @@ final class TestingController extends AbstractController
     #[Route('/api/testing', name: 'app_testing')]
     public function index(): Response
     {
-        return new JsonResponse([
-            'message' => 'Testing endpoint is working',
-        ]);
+        return new JsonResponse([]);
     }
 }

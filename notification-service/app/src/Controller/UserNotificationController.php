@@ -4,25 +4,83 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Dto\LatestUserNotificationsDto;
 use App\Repository\UserNotificationRepository;
+use App\Service\SiteNotificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[AsController]
 class UserNotificationController extends AbstractController
 {
     public function __construct(
-        private readonly UserNotificationRepository $userNotificationRepository
+        private readonly UserNotificationRepository $userNotificationRepository,
+        private readonly SiteNotificationService $siteNotificationService,
+        private readonly NormalizerInterface $normalizer
     ) {
     }
 
+    /**
+     * @param int $userId
+     *
+     * @return JsonResponse
+     */
     #[IsGranted('ROLE_ADMIN')]
     public function getNotVisitedCount(int $userId): JsonResponse
     {
-        return $this->json([
-            'notVisitedCount' => $this->userNotificationRepository->getNotVisitedCount($userId),
-        ]);
+        try {
+            $notVisitedCount = $this->userNotificationRepository->getNotVisitedCount($userId);
+        } catch (\Exception $e) {
+            return new JsonResponse(
+                data: ['message' => $e->getMessage()],
+                status: Response::HTTP_BAD_REQUEST,
+            );
+        }
+
+        return new JsonResponse(
+            data: ['notVisitedCount' => $notVisitedCount],
+            status: Response::HTTP_OK,
+        );
+    }
+
+    /**
+     * @param int $userId
+     *
+     * @return JsonResponse
+     *
+     * @throws ExceptionInterface
+     */
+    #[IsGranted('ROLE_ADMIN')]
+    public function getLatestSiteNotifications(int $userId): JsonResponse
+    {
+        try {
+            $notAckedCount = $this->userNotificationRepository->getNotAckedCount(userId: $userId);
+            $notVisitedCount = $this->userNotificationRepository->getNotVisitedCount(userId: $userId);
+            $latestNotifications = $this->userNotificationRepository->getLatestActiveUserNotifications(userId: $userId);
+            $this->siteNotificationService->convertPendingGenericNotificationsToPersonal($userId);
+
+            $responseDto = new LatestUserNotificationsDto(
+                notAckedCount: $notAckedCount,
+                notVisitedCount: $notVisitedCount,
+                notifications: $latestNotifications,
+            );
+
+            $normalizedData = $this->normalizer->normalize($responseDto, 'json', ['groups' => 'notification']);
+        } catch (\Exception $e) {
+            return new JsonResponse(
+                data: ['message' => $e->getMessage()],
+                status: Response::HTTP_BAD_REQUEST,
+            );
+        }
+
+        return new JsonResponse(
+            data: $normalizedData,
+            status: Response::HTTP_OK,
+        );
     }
 }

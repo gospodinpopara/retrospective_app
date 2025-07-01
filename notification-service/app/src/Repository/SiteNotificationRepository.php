@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\SiteNotification;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,6 +17,23 @@ class SiteNotificationRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, SiteNotification::class);
+    }
+
+    /**
+     * @return SiteNotification[]
+     */
+    public function getActiveGenericSiteNotifications(): array
+    {
+        $qb = $this->createQueryBuilder('sn');
+
+        $qb->andWhere('sn.dateFrom <= :now')
+            ->andWhere('sn.dateTo >= :now')
+            ->andWhere('sn.eolDate >= :now')
+            ->andWhere('sn.generic = :generic')
+            ->setParameter('now', new \DateTimeImmutable('now'), Types::DATE_IMMUTABLE)
+            ->setParameter('generic', true, Types::BOOLEAN);
+
+        return $qb->getQuery()->getResult();
     }
 
     //    /**

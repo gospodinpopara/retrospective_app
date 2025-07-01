@@ -10,14 +10,12 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\OpenApi\Model\Operation;
-use ApiPlatform\OpenApi\Model\Parameter;
-use ApiPlatform\OpenApi\Model\Response;
+use App\Dto\LatestUserNotificationsDto;
 use App\Repository\UserNotificationRepository;
-// Recommended for serialization control
-use Doctrine\DBAL\Types\Types; // Import for OpenAPI Operation object
-use Doctrine\ORM\Mapping as ORM; // Import for OpenAPI Parameter object
-use Gedmo\Mapping\Annotation as Gedmo; // Import for OpenAPI Response object
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 // Required for OpenAPI content definition
 
@@ -35,36 +33,51 @@ use Gedmo\Mapping\Annotation as Gedmo; // Import for OpenAPI Response object
             read: false,
             name: 'get_user_not_visited_count',
         ),
+        new Get(
+            uriTemplate: '/user_notifications/latest_site_notifications/{userId}',
+            controller: 'App\\Controller\\UserNotificationController::getLatestSiteNotifications',
+            output: LatestUserNotificationsDto::class,
+            read: false,
+            name: 'get_user_latest_site_notifications',
+        ),
     ],
-    security: 'is_granted("ROLE_ADMIN")',
+    normalizationContext: ['groups' => ['notification']],
 )]
 class UserNotification
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['notification'])]
     private ?int $id = null;
 
+    #[Groups(['notification'])]
     #[ORM\Column]
     private ?int $userId = null;
 
+    #[Groups(['notification'])]
     #[ORM\Column]
-    private ?bool $ack = null;
+    private ?bool $ack = false;
 
+    #[Groups(['notification'])]
     #[ORM\Column]
-    private ?bool $visited = null;
+    private ?bool $visited = false;
 
+    #[Groups(['notification'])]
     #[ORM\Column]
-    private ?bool $served = null;
+    private ?bool $served = false;
 
+    #[Groups(['notification'])]
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTime $createdAt = null;
+    protected ?\DateTime $createdAt = null;
 
+    #[Groups(['notification'])]
     #[Gedmo\Timestampable(on: 'update')]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTime $updatedAt = null;
+    protected ?\DateTime $updatedAt = null;
 
+    #[Groups(['notification'])]
     #[ORM\ManyToOne(cascade: ['remove'])]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?SiteNotification $notification = null;

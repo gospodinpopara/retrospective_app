@@ -15,6 +15,7 @@ use App\Repository\SiteNotificationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SiteNotificationRepository::class)]
 #[ApiResource(
@@ -25,43 +26,54 @@ use Gedmo\Mapping\Annotation as Gedmo;
         new Delete(),
         new Patch(),
     ],
-    security: 'is_granted("ROLE_ADMIN")',
+    normalizationContext: ['groups' => ['notification']],
 )]
 class SiteNotification
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['notification'])]
     private ?int $id = null;
 
+    #[Groups(['notification'])]
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
+    #[Groups(['notification'])]
     #[ORM\Column(length: 512)]
     private ?string $body = null;
 
+    #[Groups(['notification'])]
     #[ORM\Column(length: 512)]
     private ?string $link = null;
 
+    #[Groups(['notification'])]
     #[ORM\Column(length: 255, enumType: SiteNotificationType::class)]
     private ?SiteNotificationType $type = null;
 
+    #[Groups(['notification'])]
     #[ORM\Column]
     private ?\DateTime $dateFrom = null;
 
+    #[Groups(['notification'])]
     #[ORM\Column]
     private ?\DateTime $dateTo = null;
 
+    #[Groups(['notification'])]
     #[ORM\Column]
-    private ?bool $generic = null;
+    private ?bool $generic = false;
 
+    #[Groups(['notification'])]
     #[ORM\Column]
     private ?\DateTime $eolDate = null;
 
+    #[Groups(['notification'])]
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTime $createdAt = null;
 
+    #[Groups(['notification'])]
     #[Gedmo\Timestampable(on: 'update')]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTime $updatedAt = null;
