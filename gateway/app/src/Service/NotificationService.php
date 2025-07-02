@@ -7,9 +7,14 @@ namespace App\Service;
 use App\DTO\Filter\UserNotificationFilter;
 use App\DTO\Response\Notification\LatestUserNotificationsResponse;
 use App\DTO\Response\Notification\UserNotificationCollectionResponse;
+use App\Message\UserNotificationMessage;
 use App\Model\UserNotification;
 use App\Utils\ApiHelper;
+use DateTimeInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -20,7 +25,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class NotificationService
 {
     public function __construct(
-        private readonly HttpClientInterface $notificationClient
+        private readonly HttpClientInterface $notificationClient,
+        private readonly MessageBusInterface $messageBus,
     ) {
     }
 
@@ -139,5 +145,46 @@ class NotificationService
         }
 
         return $userNotificationList;
+    }
+
+    /**
+     * Dispatches a user notification message to RabbitMQ.
+     *
+     * @param int $userId The ID of the user to notify.
+     * @param string $title The title of the notification.
+     * @param string $body The main content/body of the notification.
+     * @param string $link The URL link associated with the notification.
+     * @param string $type The type of notification (e.g., 'email', 'sms', 'in_app').
+     * @param DateTimeInterface $dateFrom The date from which the notification is valid.
+     * @param DateTimeInterface $dateTo The date until which the notification is valid.
+     * @param DateTimeInterface|null $eolDate (Optional) End of life date for the notification.
+     * @throws ExceptionInterface
+     */
+    public function sendUserNotification(
+        int $userId,
+        string $title,
+        string $body,
+        string $link,
+        string $type,
+        DateTimeInterface $dateFrom,
+        DateTimeInterface $dateTo,
+        ?DateTimeInterface $eolDate = null
+    ): void {
+        $message = new UserNotificationMessage(
+            $userId,
+            $title,
+            $body,
+            $link,
+            $type,
+            $dateFrom,
+            $dateTo,
+            $eolDate
+        );
+
+        $this->messageBus->dispatch(
+            $message,
+            [new AmqpStamp('notifications.user.send')]
+        );
+
     }
 }

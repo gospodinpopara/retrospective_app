@@ -6,17 +6,39 @@ namespace App\Model;
 
 class UserNotification
 {
+
+    public const string NOTIFICATION_TYPE_INFO = 'info';
+    public const string NOTIFICATION_TYPE_RETROSPECTIVE_INVITATION = 'retrospective_invitation';
+    public const string NOTIFICATION_TYPE_RETROSPECTIVE_REMINDER = 'retrospective_reminder';
+
+    public const array NOTIFICATION_TYPES = [
+        self::NOTIFICATION_TYPE_INFO,
+        self::NOTIFICATION_TYPE_RETROSPECTIVE_INVITATION,
+        self::NOTIFICATION_TYPE_RETROSPECTIVE_REMINDER,
+    ];
+
     private ?int $siteNotificationId = null;
+
     private ?int $userNotificationId = null;
+
     private ?string $title = null;
+
     private ?string $body = null;
+
     private ?string $link = null;
+
     private ?string $type = null;
+
     private ?\DateTimeInterface $dateFrom = null;
+
     private ?\DateTimeInterface $dateTo = null;
+
     private ?\DateTimeInterface $createdAt = null;
+
     private ?bool $visited = null;
+
     private ?bool $served = null;
+
     private ?bool $generic = null;
 
     public function getSiteNotificationId(): ?int

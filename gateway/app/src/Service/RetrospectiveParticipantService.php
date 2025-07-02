@@ -14,14 +14,17 @@ use App\DTO\Response\RetrospectiveParticipant\UpdateRetrospectiveParticipantResp
 use App\Entity\RetrospectiveParticipant;
 use App\Entity\User;
 use App\Model\RetrospectiveInvite;
+use App\Model\UserNotification;
 use App\Repository\RetrospectiveParticipantRepository;
 use App\Repository\RetrospectiveRepository;
 use App\Repository\UserRepository;
 use App\Utils\ValidationErrorFormatter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 
 class RetrospectiveParticipantService
 {
@@ -34,14 +37,17 @@ class RetrospectiveParticipantService
         private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly ValidatorInterface $validator,
+        private readonly NotificationService $notificationService
     ) {
     }
 
     /**
-     * @param User                           $owner
+     * @param User $owner
      * @param InviteUserToRetrospectiveInput $inviteUserToRetrospectiveInput
      *
      * @return InviteRetrospectiveParticipantResponse
+     * @throws ExceptionInterface
+     * @throws \DateMalformedStringException
      */
     public function createRetrospectiveParticipant(User $owner, InviteUserToRetrospectiveInput $inviteUserToRetrospectiveInput): InviteRetrospectiveParticipantResponse
     {
@@ -82,6 +88,17 @@ class RetrospectiveParticipantService
 
         $this->entityManager->persist($retrospectiveParticipant);
         $this->entityManager->flush();
+
+        $this->notificationService->sendUserNotification(
+            userId: $participant->getId(),
+            title: 'You have been invited to a retrospective',
+            body: "You have been invited to participate in the retrospective titled '{$retrospective->getTitle()}'.",
+            link: '/retrospectives_invites/' . $retrospectiveParticipant->getId(),
+            type: UserNotification::NOTIFICATION_TYPE_RETROSPECTIVE_INVITATION,
+            dateFrom: new \DateTimeImmutable(),
+            dateTo: $retrospective->getStartTime(),
+            eolDate: new \DateTimeImmutable($retrospective->getStartTime()->format('Y-m-d H:i:s'))->modify('+1 day')
+        );
 
         return InviteRetrospectiveParticipantResponse::success(retrospectiveParticipant: $retrospectiveParticipant);
     }

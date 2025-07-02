@@ -84,7 +84,7 @@ class UserNotification
     protected ?\DateTime $updatedAt = null;
 
     #[Groups(['notification'])]
-    #[ORM\ManyToOne(cascade: ['remove'])]
+    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?SiteNotification $notification = null;
 
