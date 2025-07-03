@@ -100,6 +100,18 @@ class UserNotificationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function setAllAsAck(int $userId): int
+    {
+        return $this->createQueryBuilder('un')
+            ->update()
+            ->set('un.ack', ':ack')
+            ->where('un.userId = :userId')
+            ->setParameter('ack', true, Types::BOOLEAN)
+            ->setParameter('userId', $userId, Types::INTEGER)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return UserNotification[] Returns an array of UserNotification objects
     //     */

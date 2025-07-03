@@ -9,6 +9,7 @@ use App\Repository\UserNotificationRepository;
 use App\Service\SiteNotificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -87,5 +88,39 @@ class UserNotificationController extends AbstractController
             data: $normalizedData,
             status: Response::HTTP_OK,
         );
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    #[IsGranted('ROLE_ADMIN')]
+    public function setAllAsAck(Request $request): JsonResponse
+    {
+        try {
+            $requestParameters = json_decode((string) $request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+
+            if (!isset($requestParameters['userId']) || !\is_int($requestParameters['userId']) || $requestParameters['userId'] <= 0) {
+                return new JsonResponse(
+                    data: ['message' => 'Invalid or missing userId in the request body.'],
+                    status: Response::HTTP_BAD_REQUEST,
+                );
+            }
+
+            $userId = $requestParameters['userId'];
+
+            $ackedCount = $this->userNotificationRepository->setAllAsAck($userId);
+
+            return new JsonResponse(
+                data: ['ackedCount' => $ackedCount],
+                status: Response::HTTP_OK,
+            );
+        } catch (\JsonException $e) {
+            return new JsonResponse(
+                data: ['message' => 'Invalid JSON format: '.$e->getMessage()],
+                status: Response::HTTP_BAD_REQUEST,
+            );
+        }
     }
 }

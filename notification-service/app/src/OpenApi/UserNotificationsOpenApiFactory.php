@@ -6,6 +6,7 @@ namespace App\OpenApi;
 
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\OpenApi\Model\RequestBody;
 use ApiPlatform\OpenApi\Model\Response;
 use ApiPlatform\OpenApi\OpenApi;
 
@@ -101,6 +102,54 @@ class UserNotificationsOpenApiFactory implements OpenApiFactoryInterface
                                 description: 'The ID of the user.',
                                 required: true,
                                 schema: ['type' => 'integer'],
+                            ),
+                        ]),
+                    ),
+                );
+            }
+        }
+
+        // Context Controller/UserNotificationController::setAllAck
+        $pathItem = $openApi->getPaths()->getPath('/api/user_notifications/set_all_as_ack');
+        if ($pathItem) {
+            $operation = $pathItem->getPost();
+            if ($operation) {
+                $openApi->getPaths()->addPath('/api/user_notifications/set_all_as_ack',
+                    $pathItem->withPost($operation
+                        ->withSummary('Sets all notifications for a user as acknowledged.')
+                        ->withDescription('Acknowledges all notifications for a specific user.')
+                        ->withRequestBody(
+                            new RequestBody(
+                                description: 'The request body containing the userId.',
+                                content: new \ArrayObject([
+                                    'application/json' => [
+                                        'schema' => [
+                                            'type' => 'object',
+                                            'properties' => [
+                                                'userId' => ['type' => 'integer', 'example' => 123],
+                                            ],
+                                            'required' => ['userId'],
+                                        ],
+                                    ],
+                                ]),
+                            ),
+                        )
+                        ->withResponses([
+                            '200' => new Response(
+                                description: 'All notifications acknowledged successfully.',
+                                content: new \ArrayObject([
+                                    'application/json' => [
+                                        'schema' => [
+                                            'type' => 'object',
+                                            'properties' => [
+                                                'ackedCount' => ['type' => 'integer', 'example' => 10],
+                                            ],
+                                        ],
+                                    ],
+                                ]),
+                            ),
+                            '400' => new Response(
+                                description: 'Invalid or missing userId in the request body.',
                             ),
                         ]),
                     ),

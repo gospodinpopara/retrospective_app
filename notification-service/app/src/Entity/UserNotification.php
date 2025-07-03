@@ -42,13 +42,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
             read: false,
             name: 'get_user_latest_site_notifications',
         ),
+        new Post(
+            uriTemplate: '/user_notifications/set_all_as_ack',
+            controller: 'App\\Controller\\UserNotificationController::setAllAsAck',
+            read: false,
+            name: 'set_all_user_notifications_as_ack',
+        ),
     ],
     normalizationContext: ['groups' => ['notification']],
     paginationClientEnabled: true,
     paginationClientItemsPerPage: true,
     paginationItemsPerPage: 15,
 )]
-#[ApiFilter(filterClass: NumericFilter::class, properties: ['userId'])]
+#[ApiFilter(filterClass: NumericFilter::class, properties: ['userId', 'id'])]
 class UserNotification
 {
     #[ORM\Id]

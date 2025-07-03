@@ -7,6 +7,7 @@ namespace App\GraphQL\Resolver;
 use App\DTO\Filter\UserNotificationFilter;
 use App\DTO\Response\Notification\LatestUserNotificationsResponse;
 use App\DTO\Response\Notification\UserNotificationCollectionResponse;
+use App\Model\UserNotification;
 use App\Security\AuthorizationTrait;
 use App\Service\NotificationService;
 use Overblog\GraphQLBundle\Definition\Argument;
@@ -67,5 +68,23 @@ class NotificationResolver implements QueryInterface
         ));
 
         return $this->notificationService->getUserNotifications($filters);
+    }
+
+    /**
+     * @throws \DateMalformedStringException
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function resolveUserNotification(Argument $args): UserNotification
+    {
+        $user = $this->getAuthenticatedUser($this->security);
+
+        return $this->notificationService->getUserNotification(
+            user: $user,
+            userNotificationId: $args->offsetGet('id'),
+        );
     }
 }

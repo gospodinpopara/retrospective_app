@@ -25,7 +25,6 @@ use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-
 class RetrospectiveParticipantService
 {
     use ValidationErrorFormatter;
@@ -42,10 +41,11 @@ class RetrospectiveParticipantService
     }
 
     /**
-     * @param User $owner
+     * @param User                           $owner
      * @param InviteUserToRetrospectiveInput $inviteUserToRetrospectiveInput
      *
      * @return InviteRetrospectiveParticipantResponse
+     *
      * @throws ExceptionInterface
      * @throws \DateMalformedStringException
      */
@@ -93,11 +93,11 @@ class RetrospectiveParticipantService
             userId: $participant->getId(),
             title: 'You have been invited to a retrospective',
             body: "You have been invited to participate in the retrospective titled '{$retrospective->getTitle()}'.",
-            link: '/retrospectives_invites/' . $retrospectiveParticipant->getId(),
+            link: '/retrospectives_invites/'.$retrospectiveParticipant->getId(),
             type: UserNotification::NOTIFICATION_TYPE_RETROSPECTIVE_INVITATION,
             dateFrom: new \DateTimeImmutable(),
             dateTo: $retrospective->getStartTime(),
-            eolDate: new \DateTimeImmutable($retrospective->getStartTime()->format('Y-m-d H:i:s'))->modify('+1 day')
+            eolDate: new \DateTimeImmutable($retrospective->getStartTime()->format('Y-m-d H:i:s'))->modify('+1 day'),
         );
 
         return InviteRetrospectiveParticipantResponse::success(retrospectiveParticipant: $retrospectiveParticipant);

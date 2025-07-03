@@ -44,3 +44,8 @@ Query:
         args:
           filters: "UserNotificationFiltersInput"
         resolve: '@=query("App\\GraphQL\\Resolver\\NotificationResolver::resolveUserNotifications", args)'
+      userNotification:
+        type: "UserNotification"
+        args:
+          id: "Int!"
+        resolve: '@=query("App\\GraphQL\\Resolver\\NotificationResolver::resolveUserNotification", args)'

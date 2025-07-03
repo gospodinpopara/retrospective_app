@@ -34,6 +34,7 @@ class RetrospectiveParticipantMutation implements MutationInterface
      * @param Argument $args
      *
      * @return InviteRetrospectiveParticipantResponse
+     *
      * @throws ExceptionInterface
      */
     public function createRetrospectiveParticipantMutation(Argument $args): InviteRetrospectiveParticipantResponse

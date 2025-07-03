@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Message;
 
 use App\Model\UserNotification;
@@ -26,11 +28,8 @@ class UserNotificationMessage
         \DateTimeInterface $dateTo,
         ?\DateTimeInterface $eolDate = null
     ) {
-
-        if (!in_array($type, UserNotification::NOTIFICATION_TYPES)) {
-            throw new \InvalidArgumentException(
-                message: "Invalid notification type: {$type}. Allowed types are: " . implode(', ', UserNotification::NOTIFICATION_TYPES)
-            );
+        if (!\in_array($type, UserNotification::NOTIFICATION_TYPES)) {
+            throw new \InvalidArgumentException(message: "Invalid notification type: {$type}. Allowed types are: ".implode(', ', UserNotification::NOTIFICATION_TYPES));
         }
 
         $this->userId = $userId;

@@ -6,7 +6,6 @@ namespace App\Model;
 
 class UserNotification
 {
-
     public const string NOTIFICATION_TYPE_INFO = 'info';
     public const string NOTIFICATION_TYPE_RETROSPECTIVE_INVITATION = 'retrospective_invitation';
     public const string NOTIFICATION_TYPE_RETROSPECTIVE_REMINDER = 'retrospective_reminder';

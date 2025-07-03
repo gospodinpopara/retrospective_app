@@ -7,10 +7,10 @@ namespace App\Service;
 use App\DTO\Filter\UserNotificationFilter;
 use App\DTO\Response\Notification\LatestUserNotificationsResponse;
 use App\DTO\Response\Notification\UserNotificationCollectionResponse;
+use App\Entity\User;
 use App\Message\UserNotificationMessage;
 use App\Model\UserNotification;
 use App\Utils\ApiHelper;
-use DateTimeInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
@@ -63,6 +63,45 @@ class NotificationService
     }
 
     /**
+     * @param User $user
+     * @param      $userNotificationId
+     *
+     * @return UserNotification
+     *
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws \DateMalformedStringException
+     */
+    public function getUserNotification(User $user, int $userNotificationId): UserNotification
+    {
+        $userNotificationResponse = $this->notificationClient->request('GET', '/api/user_notifications',
+            [
+                'query' => [
+                    'userId' => $user->getId(),
+                    'id' => $userNotificationId,
+                ],
+                'headers' => [
+                    'Accept' => 'application/ld+json',
+                ],
+            ]);
+
+        if ($userNotificationResponse->getStatusCode() !== Response::HTTP_OK) {
+            throw new \RuntimeException(message: 'Failed to fetch user notification', code: $userNotificationResponse->getStatusCode());
+        }
+
+        $userNotificationData = $userNotificationResponse->toArray();
+
+        if ($userNotificationData['totalItems'] === 0) {
+            throw new \RuntimeException(message: 'User notification not found', code: Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->convertNotification($userNotificationData['member'][0]);
+    }
+
+    /**
      * @param UserNotificationFilter $filters
      *
      * @return UserNotificationCollectionResponse
@@ -107,6 +146,113 @@ class NotificationService
     }
 
     /**
+     * @throws TransportExceptionInterface
+     */
+    public function setAllAsAck(User $user): bool
+    {
+        $response = $this->notificationClient->request('POST', '/api/user_notifications/set_all_as_ack', [
+            'json' => [
+                'userId' => $user->getId(),
+            ],
+        ]);
+
+        return $response->getStatusCode() === Response::HTTP_OK;
+    }
+
+    /**
+     * @param User $user
+     * @param int  $userNotificationId
+     *
+     * @return bool
+     *
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function setVisitedUserNotification(User $user, int $userNotificationId): bool
+    {
+        $userNotificationResponse = $this->notificationClient->request('GET', '/api/user_notifications',
+            [
+                'query' => [
+                    'userId' => $user->getId(),
+                    'id' => $userNotificationId,
+                ],
+                'headers' => [
+                    'Accept' => 'application/ld+json',
+                ],
+            ]);
+
+        if ($userNotificationResponse->getStatusCode() !== Response::HTTP_OK) {
+            throw new \RuntimeException(message: 'Failed to fetch user notification', code: $userNotificationResponse->getStatusCode());
+        }
+
+        $userNotificationData = $userNotificationResponse->toArray();
+
+        if ($userNotificationData['totalItems'] === 0) {
+            throw new \RuntimeException(message: 'User notification not found', code: Response::HTTP_NOT_FOUND);
+        }
+
+        $userNotification = $userNotificationData['member'][0];
+
+        $userNotificationVisitedResponse = $this->notificationClient->request('PATCH', "/api/user_notifications/{$userNotification['id']}", [
+            'json' => [
+                'visited' => true,
+            ],
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/merge-patch+json',
+            ],
+        ]);
+
+        if ($userNotificationVisitedResponse->getStatusCode() !== Response::HTTP_OK) {
+            throw new \RuntimeException(message: 'Failed to update user notification as visited', code: $userNotificationVisitedResponse->getStatusCode());
+        }
+
+        return true;
+    }
+
+    /**
+     * Converts a single notification array into a UserNotification object.
+     *
+     * @param array $userNotification
+     *
+     * @return UserNotification
+     *
+     * @throws \DateMalformedStringException
+     */
+    private function convertNotification(array $userNotification): UserNotification
+    {
+        $notification = new UserNotification()
+            ->setSiteNotificationId($userNotification['notification']['id'] ?? null)
+            ->setUserNotificationId($userNotification['id'] ?? null)
+            ->setTitle($userNotification['notification']['title'] ?? null)
+            ->setBody($userNotification['notification']['body'] ?? null)
+            ->setLink($userNotification['notification']['link'] ?? null)
+            ->setType($userNotification['notification']['type'] ?? null)
+            ->setVisited($userNotification['visited'] ?? null)
+            ->setServed($userNotification['served'] ?? null)
+            ->setGeneric($userNotification['notification']['generic'] ?? null);
+
+        if (!empty($userNotification['notification']['dateFrom'])) {
+            $notification->setDateFrom(new \DateTime($userNotification['notification']['dateFrom']));
+        }
+
+        if (!empty($userNotification['notification']['dateTo'])) {
+            $notification->setDateTo(new \DateTime($userNotification['notification']['dateTo']));
+        }
+
+        if (!empty($userNotification['createdAt'])) {
+            $notification->setCreatedAt(new \DateTime($userNotification['createdAt']));
+        }
+
+        return $notification;
+    }
+
+    /**
+     * Converts a list of notification arrays into an array of UserNotification objects.
+     *
      * @param array $list
      *
      * @return UserNotification[]
@@ -118,30 +264,7 @@ class NotificationService
         $userNotificationList = [];
 
         foreach ($list as $userNotification) {
-            $notification = new UserNotification()
-                ->setSiteNotificationId($userNotification['notification']['id'] ?? null)
-                ->setUserNotificationId($userNotification['id'] ?? null)
-                ->setTitle($userNotification['notification']['title'] ?? null)
-                ->setBody($userNotification['notification']['body'] ?? null)
-                ->setLink($userNotification['notification']['link'] ?? null)
-                ->setType($userNotification['notification']['type'] ?? null)
-                ->setVisited($userNotification['visited'] ?? null)
-                ->setServed($userNotification['served'] ?? null)
-                ->setGeneric($userNotification['notification']['generic'] ?? null);
-
-            if (!empty($userNotification['notification']['dateFrom'])) {
-                $notification->setDateFrom(new \DateTime($userNotification['notification']['dateFrom']));
-            }
-
-            if (!empty($userNotification['notification']['dateTo'])) {
-                $notification->setDateTo(new \DateTime($userNotification['notification']['dateTo']));
-            }
-
-            if (!empty($userNotification['createdAt'])) {
-                $notification->setCreatedAt(new \DateTime($userNotification['createdAt']));
-            }
-
-            $userNotificationList[] = $notification;
+            $userNotificationList[] = $this->convertNotification($userNotification);
         }
 
         return $userNotificationList;
@@ -150,14 +273,15 @@ class NotificationService
     /**
      * Dispatches a user notification message to RabbitMQ.
      *
-     * @param int $userId The ID of the user to notify.
-     * @param string $title The title of the notification.
-     * @param string $body The main content/body of the notification.
-     * @param string $link The URL link associated with the notification.
-     * @param string $type The type of notification (e.g., 'email', 'sms', 'in_app').
-     * @param DateTimeInterface $dateFrom The date from which the notification is valid.
-     * @param DateTimeInterface $dateTo The date until which the notification is valid.
-     * @param DateTimeInterface|null $eolDate (Optional) End of life date for the notification.
+     * @param int                     $userId   the ID of the user to notify
+     * @param string                  $title    the title of the notification
+     * @param string                  $body     the main content/body of the notification
+     * @param string                  $link     the URL link associated with the notification
+     * @param string                  $type     The type of notification (e.g., 'email', 'sms', 'in_app').
+     * @param \DateTimeInterface      $dateFrom the date from which the notification is valid
+     * @param \DateTimeInterface      $dateTo   the date until which the notification is valid
+     * @param \DateTimeInterface|null $eolDate  (Optional) End of life date for the notification
+     *
      * @throws ExceptionInterface
      */
     public function sendUserNotification(
@@ -166,9 +290,9 @@ class NotificationService
         string $body,
         string $link,
         string $type,
-        DateTimeInterface $dateFrom,
-        DateTimeInterface $dateTo,
-        ?DateTimeInterface $eolDate = null
+        \DateTimeInterface $dateFrom,
+        \DateTimeInterface $dateTo,
+        ?\DateTimeInterface $eolDate = null
     ): void {
         $message = new UserNotificationMessage(
             $userId,
@@ -178,13 +302,12 @@ class NotificationService
             $type,
             $dateFrom,
             $dateTo,
-            $eolDate
+            $eolDate,
         );
 
         $this->messageBus->dispatch(
             $message,
-            [new AmqpStamp('notifications.user.send')]
+            [new AmqpStamp('notifications.user.send')],
         );
-
     }
 }
