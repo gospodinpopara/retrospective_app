@@ -17,6 +17,7 @@ use Overblog\GraphQLBundle\Definition\Resolver\MutationInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class RetrospectiveParticipantMutation implements MutationInterface
@@ -33,6 +34,8 @@ class RetrospectiveParticipantMutation implements MutationInterface
      * @param Argument $args
      *
      * @return InviteRetrospectiveParticipantResponse
+     *
+     * @throws ExceptionInterface
      */
     public function createRetrospectiveParticipantMutation(Argument $args): InviteRetrospectiveParticipantResponse
     {

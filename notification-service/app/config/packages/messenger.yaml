@@ -1,0 +1,18 @@
+framework:
+    messenger:
+        transports:
+            user_notification_queue:
+                dsn: '%env(AMQP_DSN)%/notifications.user.queue'
+                serializer: 'messenger.transport.symfony_serializer'
+                options:
+                    vhost: '/'
+                    exchange:
+                        name: 'notifications.user.exchange.direct'
+                        type: 'direct'
+                    queues:
+                        'notifications.user.queue':
+                            binding_keys: ['notifications.user.send']
+                failure_transport: failed_user_notifications
+            failed_user_notifications: 'doctrine://default?queue_name=failed_user_notifications_queue'
+        routing:
+            App\Message\UserNotificationMessage: user_notification_queue

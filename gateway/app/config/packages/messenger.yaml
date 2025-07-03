@@ -1,0 +1,17 @@
+framework:
+    messenger:
+        transports:
+            user_notification_transport:
+                dsn: '%env(AMQP_DSN)%'
+                serializer: 'messenger.transport.symfony_serializer'
+                options:
+                    heartbeat: 60
+                    queues:
+                        notifications.user.queue:
+                            binding_keys: [ 'notifications.user.send' ]
+                    exchange:
+                        name: 'notifications.user.exchange.direct'
+                        type: 'direct'
+
+        routing:
+            'App\Message\UserNotificationMessage': user_notification_transport

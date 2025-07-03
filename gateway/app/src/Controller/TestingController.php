@@ -4,29 +4,25 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Repository\UserRepository;
-use App\Service\RetrospectiveParticipantService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class TestingController extends AbstractController
 {
     public function __construct(
-        //        private readonly Security $security,
-        //        private readonly RetrospectiveParticipantService $retrospectiveParticipantService,
-        //        private readonly UserRepository $userRepository,
     ) {
     }
 
     /**
-     * @throws ExceptionInterface
+     * @return JsonResponse
+     *
+     * @throws TransportExceptionInterface
      */
     #[Route('/testing', name: 'testing')]
     public function test(): JsonResponse
     {
-        return new JsonResponse([]);
+        return new JsonResponse(['OK']);
     }
 }

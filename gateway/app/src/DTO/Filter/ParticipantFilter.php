@@ -12,7 +12,6 @@ use Symfony\Component\Serializer\Serializer;
 class ParticipantFilter
 {
     use PaginationTrait;
-
     private ?string $email = null;
     private ?string $firstName = null;
     private ?string $lastName = null;

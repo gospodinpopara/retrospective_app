@@ -1,0 +1,85 @@
+UserNotification:
+  type: object
+  config:
+    description: "User notification information"
+    fields:
+      siteNotificationId:
+        type: "Int"
+        description: "ID of the site notification"
+      userNotificationId:
+        type: "Int"
+        description: "ID of the user notification"
+      title:
+        type: "String"
+        description: "Title of the notification"
+      body:
+        type: "String"
+        description: "Body content of the notification"
+      link:
+        type: "String"
+        description: "Link associated with the notification"
+      type:
+        type: "String"
+        description: "Type of notification"
+      dateFrom:
+        type: "DateTime"
+        description: "Start date of the notification validity"
+      dateTo:
+        type: "DateTime"
+        description: "End date of the notification validity"
+      createdAt:
+        type: "DateTime"
+        description: "Creation timestamp of the notification"
+      visited:
+        type: "Boolean"
+        description: "Whether the notification has been visited"
+      served:
+        type: "Boolean"
+        description: "Whether the notification has been served"
+      generic:
+        type: "Boolean"
+        description: "Whether the notification is generic"
+
+LatestUserNotificationsResponse:
+  type: object
+  config:
+    description: "Collection of user notifications with additional metadata"
+    fields:
+      notificationList:
+        type: "[UserNotification]"
+        description: "List of user notifications"
+      notAckedCount:
+        type: "Int!"
+        description: "Number of notifications that have not been acknowledged"
+      notVisitedCount:
+        type: "Int!"
+        description: "Number of notifications that have not been visited"
+      totalItems:
+        type: "Int!"
+        description: "Total number of notifications in the collection"
+
+UserNotificationCollectionResponse:
+  type: object
+  config:
+    description: "Response containing user notifications with pagination"
+    fields:
+      data:
+        type: "[UserNotification]!"
+        description: "Array of user notification objects"
+      pagination:
+        type: "Pagination!"
+        description: "Pagination information for the notification collection"
+
+UserNotificationFiltersInput:
+  type: input-object
+  config:
+    description: "Filters for querying user notifications"
+    fields:
+      page:
+        type: "Int!"
+        defaultValue: 1
+        description: "Page number for pagination"
+      itemsPerPage:
+        type: "Int!"
+        defaultValue: 10
+        description: "Number of items per page for pagination"

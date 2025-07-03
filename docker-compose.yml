@@ -36,7 +36,32 @@ services:
 
   ######################## RABBIT MQ #########################
 
-  # TODO -> SETUP RabbitMQ
+  retrospective-rabbitmq-service:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-retrospective
+    restart: unless-stopped
+    ports:
+      - "5672:5672"   # RabbitMQ default port
+      - "15672:15672" # Management UI port
+    environment:
+      RABBITMQ_DEFAULT_USER: retrospective
+      RABBITMQ_DEFAULT_PASS: retrospective
+    volumes:
+      - retrospective-rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - retrospective-network
+
+  ######################## MAILER SERVICE  ##############################
+
+  retrospective-mailhog-service:
+    image: mailhog/mailhog
+    container_name: mailhog-retrospective
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP server
+      - "8025:8025" # Web UI
+    networks:
+      - retrospective-network
 
   ###################### GATEWAY CONFIG ######################
 
@@ -51,6 +76,9 @@ services:
       - retrospective-network
     environment:
       PHP_CS_FIXER_IGNORE_ENV: 1 #cs fixer still don't support php 8.4, fix flag
+      NOTIFICATIONS_API_URL: 'http://notification-nginx-service:80'
+      NOTIFICATIONS_API_KEY: 'f8JhT7kL9pQ2mN4rX6yC1bV3zG5aW0oU'
+      AMQP_DSN: 'amqp://retrospective:retrospective@retrospective-rabbitmq-service:5672'
 
   gateway-nginx-service:
     image: nginx:stable-alpine
@@ -80,6 +108,7 @@ services:
     environment:
       PHP_CS_FIXER_IGNORE_ENV: 1 #cs fixer still don't support php 8.4, fix flag
       API_KEY: 'f8JhT7kL9pQ2mN4rX6yC1bV3zG5aW0oU'
+      AMQP_DSN: 'amqp://retrospective:retrospective@retrospective-rabbitmq-service:5672'
 
   notification-nginx-service:
     image: nginx:stable-alpine
@@ -94,13 +123,7 @@ services:
     networks:
       - retrospective-network
 
-  ################# MAILER SERVICE CONFIG #######################
-
-  # TODO -> SETUP Mailer service
-
 
 volumes:
   mysql8-retrospective-data:
-
-
-#ENV
+  retrospective-rabbitmq-data:

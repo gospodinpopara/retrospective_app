@@ -5,6 +5,22 @@ framework:
     # Note that the session will be started ONLY if you read or write from it.
     session: true
 
+    http_client:
+        default_options:
+            retry_failed:
+                http_codes:
+                    0: [ 'GET', 'HEAD' ]
+                max_retries: 2
+                delay: 1000
+                multiplier: 2
+        scoped_clients:
+            notification.client:
+                base_uri: '%env(NOTIFICATIONS_API_URL)%'
+                headers:
+                    Accept: 'application/json'
+                    Content-Type: 'application/json'
+                    X-API-KEY: '%env(NOTIFICATIONS_API_KEY)%'
+
     #esi: true
     #fragments: true
 

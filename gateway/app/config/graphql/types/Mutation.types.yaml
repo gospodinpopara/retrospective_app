@@ -85,3 +85,13 @@ Mutation:
         args:
           cardId: "Int!"
         resolve: '@=mutation("App\\GraphQL\\Mutation\\RetrospectiveCardMutation::toggleRetrospectiveCardUpvoteMutation", args)'
+      userNotificationSetAllAsAck:
+        type: "Boolean"
+        description: "Set all user notifications as acknowledged"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\NotificationMutation::setAllAsAckMutation", args)'
+      userNotificationSetVisited:
+        type: "Boolean"
+        description: "Set user notification as visited"
+        args:
+          id: "Int!"
+        resolve: '@=mutation("App\\GraphQL\\Mutation\\NotificationMutation::setVisitedUserNotificationMutation", args)'
