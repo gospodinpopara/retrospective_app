@@ -9,6 +9,7 @@ use App\DTO\Response\Auth\UserRegistrationMutationResponse;
 use App\Entity\EmailVerificationToken;
 use App\Entity\RefreshToken;
 use App\Entity\User;
+use App\Message\EmailMessage;
 use App\Model\SiteMessageModel;
 use App\Repository\EmailVerificationTokenRepository;
 use App\Repository\UserRepository;
@@ -30,6 +31,7 @@ class AuthService
         private readonly UserRepository $userRepository,
         private readonly ValidatorInterface $validator,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly MailerService $mailerService
     ) {
     }
 
@@ -70,6 +72,8 @@ class AuthService
      * @param string $email
      *
      * @return array
+     *
+     * @throws RandomException
      */
     public function resendEmailVerificationToken(string $email): array
     {
@@ -99,8 +103,21 @@ class AuthService
             ];
         }
 
-        // $token = $this->createEmailVerificationToken($user);
-        // TODO -> generate token and send email [Independent mailer service implementation]
+        $token = $this->createEmailVerificationToken($user);
+
+        $emailMessage = new EmailMessage(
+            $user->getEmail(),
+            'Email confirmation',
+            'email_verification',
+            [
+                'name' => $user->getFirstName().' '.$user->getLastName(),
+                'activationLink' => 'https://retrospectiveapp.com/activate_account?token='.$token->getToken(),
+            ],
+        );
+
+        $this->mailerService->publishMail(
+            $emailMessage,
+        );
 
         return [
             'success' => true,
@@ -207,9 +224,24 @@ class AuthService
 
         $user->setPassword($hashedPassword);
 
-        /* Save new user */
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        $token = $this->createEmailVerificationToken($user);
+
+        $emailMessage = new EmailMessage(
+            $user->getEmail(),
+            'Email confirmation',
+            'email_verification',
+            [
+                'name' => $user->getFirstName().' '.$user->getLastName(),
+                'activationLink' => 'https://retrospectiveapp.com/activate_account?token='.$token->getToken(),
+            ],
+        );
+
+        $this->mailerService->publishMail(
+            $emailMessage,
+        );
 
         return UserRegistrationMutationResponse::success($user);
     }

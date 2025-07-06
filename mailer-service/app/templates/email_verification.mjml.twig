@@ -1,0 +1,31 @@
+<mjml>
+    <mj-head>
+        <mj-preview>Simple Email Template</mj-preview>
+        <mj-style>
+            .body-text {
+            font-size: 16px;
+            color: #333333;
+            line-height: 1.5;
+            }
+        </mj-style>
+    </mj-head>
+    <mj-body>
+        <mj-section>
+            <mj-column>
+                <mj-text css-class="body-text">
+                    Hello {{ name }},
+                </mj-text>
+                <mj-text css-class="body-text">
+                    Welcome to our retrospective service! We're glad to have you on board.
+                </mj-text>
+            </mj-column>
+        </mj-section>
+        <mj-section>
+            <mj-column>
+                <mj-button href="{{ activationLink }}" background-color="#007BFF" color="#ffffff">
+                    Confirm Your Email
+                </mj-button>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>

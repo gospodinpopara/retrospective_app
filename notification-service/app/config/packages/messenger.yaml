@@ -13,6 +13,8 @@ framework:
                         'notifications.user.queue':
                             binding_keys: ['notifications.user.send']
                 failure_transport: failed_user_notifications
+
             failed_user_notifications: 'doctrine://default?queue_name=failed_user_notifications_queue'
+
         routing:
             App\Message\UserNotificationMessage: user_notification_queue

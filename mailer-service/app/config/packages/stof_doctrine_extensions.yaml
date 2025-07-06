@@ -1,0 +1,24 @@
+# config/packages/stof_doctrine_extensions.yaml
+stof_doctrine_extensions:
+    # This default_locale is for the Translatable extension.
+    # It has no impact on Timestampable, but keep it if you intend to use translations,
+    # otherwise, you can remove it if you don't use Translatable.
+    default_locale: en_US
+
+    # This is the essential part for your 'created_at' issue:
+    orm:
+        # 'default' refers to your default entity manager.
+        # If you have multiple entity managers, you might need to configure them individually.
+        default:
+            # Enable the Timestampable extension
+            timestampable: true
+
+            # You can enable other extensions here if you plan to use them.
+            # Example (uncomment if needed):
+            # sluggable: true
+            # translatable: true
+            # loggable: true
+            # blameable: true
+            # tree: true
+            # sortable: true
+            # softdeleteable: true
