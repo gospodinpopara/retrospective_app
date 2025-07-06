@@ -1,0 +1,23 @@
+framework:
+    messenger:
+        transports:
+            mailer_queue:
+                dsn: '%env(AMQP_DSN)%/mailer.queue'
+                serializer: 'messenger.transport.symfony_serializer'
+                options:
+                    vhost: '/'
+                    exchange:
+                        name: 'mailer.exchange.direct'
+                        type: 'direct'
+                    queues:
+                        'notifications.user.queue':
+                            binding_keys: ['mailer.send']
+                failure_transport: failed_mailer_queue
+
+            failed_mailer_queue: 'doctrine://default?queue_name=failed_user_notifications_queue'
+
+        routing:
+            App\Message\EmailMessage: mailer_queue
+
+
+
